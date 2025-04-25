@@ -34,6 +34,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     
     if (widget.startFromBeginning) {
       currentIndex = 0;
+      firebase-service
       await dataService.startPack(widget.packId);
     } else {
       currentIndex = pack.lastQuestionIndex;

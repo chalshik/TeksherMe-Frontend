@@ -87,6 +87,8 @@ class BookmarkedQuestionsTab extends StatelessWidget {
               itemCount: bookmarkedQuestions.length,
               itemBuilder: (context, index) {
                 final question = bookmarkedQuestions[index];
+                final packId = dataService.getPackIdForQuestion(question.id);
+                
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
                   child: Padding(
@@ -94,12 +96,24 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          question.text,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                question.text,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.bookmark, color: Colors.amber),
+                              onPressed: () {
+                                _showUnbookmarkConfirmation(context, dataService, packId, question.id);
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         ...List.generate(
@@ -117,8 +131,12 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                                             ? Colors.green
                                             : (i == question.selectedOptionIndex
                                                 ? Colors.red
-                                                : Colors.grey[200]))
-                                        : Colors.grey[200],
+                                                : Theme.of(context).brightness == Brightness.dark 
+                                                  ? Colors.grey[800] 
+                                                  : Colors.grey[200]))
+                                        : Theme.of(context).brightness == Brightness.dark 
+                                          ? Colors.grey[800] 
+                                          : Colors.grey[200],
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
@@ -129,7 +147,9 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                                                 (i == question.correctOptionIndex ||
                                                     i == question.selectedOptionIndex)
                                             ? Colors.white
-                                            : Colors.black,
+                                            : Theme.of(context).brightness == Brightness.dark 
+                                              ? Colors.white 
+                                              : Colors.black,
                                       ),
                                     ),
                                   ),
@@ -146,6 +166,29 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                 );
               },
             ),
+    );
+  }
+  
+  void _showUnbookmarkConfirmation(BuildContext context, DataService dataService, String packId, String questionId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Bookmark'),
+        content: const Text('Are you sure you want to remove this question from your bookmarks?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              dataService.toggleQuestionBookmark(packId, questionId);
+              Navigator.pop(context);
+            },
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
     );
   }
 } 

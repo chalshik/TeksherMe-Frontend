@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/firebase_data_service.dart';
 import 'question_screen.dart';
+import 'package:provider/provider.dart';
 
 class ResultsAnalysisScreen extends StatelessWidget {
   final QuestionPack pack;
@@ -22,6 +23,8 @@ class ResultsAnalysisScreen extends StatelessWidget {
         actions: [
           TextButton.icon(
             onPressed: () {
+              final dataService = Provider.of<DataService>(context, listen: false);
+              dataService.resetPackAnswers(pack.id);
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => QuestionScreen(

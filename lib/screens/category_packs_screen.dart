@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
 import 'question_screen.dart';
 import '../widgets/pack_card.dart';
 
@@ -11,7 +11,7 @@ class CategoryPacksScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
+    final dataService = Provider.of<FirebaseDataService>(context);
     final packs = dataService.getPacksByCategory(category);
     
     return Scaffold(

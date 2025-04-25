@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
 import 'question_screen.dart';
 
 class ResultsAnalysisScreen extends StatelessWidget {

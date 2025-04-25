@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "520480110917",
+    "project_id": "teksherme-3a2fe",
+    "storage_bucket": "teksherme-3a2fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520480110917:android:fccc2b60a4919e6ea9662c",
+        "android_client_info": {
+          "package_name": "com.anonymous.TeksherMe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrcPh2R80-ZAYRip7w2cNpyBu8wbzUnYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

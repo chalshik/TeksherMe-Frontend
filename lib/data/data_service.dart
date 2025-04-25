@@ -180,18 +180,6 @@ class DataService extends ChangeNotifier {
     }
   }
   
-  // Find the pack ID for a question with the given ID
-  String getPackIdForQuestion(String questionId) {
-    for (final pack in _questionPacks) {
-      for (final question in pack.questions) {
-        if (question.id == questionId) {
-          return pack.id;
-        }
-      }
-    }
-    return ''; // Return empty string if not found
-  }
-  
   // Reset all progress
   void resetAllProgress() {
     for (final pack in _questionPacks) {
@@ -206,21 +194,6 @@ class DataService extends ChangeNotifier {
       }
     }
     notifyListeners();
-  }
-  
-  // Reset answers for a specific pack
-  void resetPackAnswers(String packId) {
-    final pack = getPackById(packId);
-    if (pack != null) {
-      pack.lastQuestionIndex = 0;
-      pack.isCompleted = false;
-      
-      for (final question in pack.questions) {
-        question.isAnswered = false;
-        question.selectedOptionIndex = null;
-      }
-      notifyListeners();
-    }
   }
   
   // Mock data initialization

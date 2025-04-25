@@ -77,9 +77,22 @@ class _LoginScreenState extends State<LoginScreen> {
       // Sign in with Google
       final UserCredential? credential = await authService.signInWithGoogle();
       
+      // If sign-in was canceled or failed
+      if (credential == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+      
       // Create or update user profile in Firestore
-      if (credential?.user != null) {
-        await firebaseService.createUserProfile(credential!.user!);
+      if (credential.user != null) {
+        try {
+          await firebaseService.createUserProfile(credential.user!);
+        } catch (e) {
+          print('Error creating user profile: $e');
+          // Continue even if profile creation fails
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -88,8 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'An error occurred. Please try again.';
+        _errorMessage = 'Authentication error. Please try again.';
       });
+      print('Sign-in error: $e');
     } finally {
       setState(() {
         _isLoading = false;

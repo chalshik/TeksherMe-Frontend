@@ -63,10 +63,17 @@ class AuthService extends ChangeNotifier {
     try {
       // For mobile platforms
       if (!kIsWeb) {
+        // Start the Google sign-in flow
         final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-        if (googleUser == null) return null;
+        if (googleUser == null) {
+          print('Sign-in canceled by user');
+          return null;
+        }
         
+        // Get authentication tokens
         final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        
+        // Create and return credential
         final OAuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,

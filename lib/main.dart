@@ -10,30 +10,35 @@ import 'screens/auth_wrapper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
-  // Initialize Firebase service
-  await FirebaseService.initialize();
-  
-  // Initialize Firebase data service
-  final dataService = FirebaseDataService();
-  await dataService.initialize();
-  
-  // Get authentication service
-  final authService = AuthService();
-  
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: dataService),
-        ChangeNotifierProvider.value(value: authService),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Initialize Firebase service
+    await FirebaseService.initialize();
+    
+    // Initialize Firebase data service
+    final dataService = FirebaseDataService();
+    await dataService.initialize();
+    
+    // Get authentication service
+    final authService = AuthService();
+    
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: dataService),
+          ChangeNotifierProvider.value(value: authService),
+        ],
+        child: const MyApp(),
+      ),
+    );
+  } catch (e) {
+    print('Error initializing app: $e');
+    // Handle initialization errors
+  }
 }
 
 class MyApp extends StatelessWidget {

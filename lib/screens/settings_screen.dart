@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
+import '../service/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
+    final dataService = Provider.of<FirebaseDataService>(context);
+    final authService = Provider.of<AuthService>(context);
+    final user = authService.currentUser;
     
     return Scaffold(
       appBar: AppBar(
@@ -18,6 +22,10 @@ class SettingsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // User profile section
+            if (user != null) _buildProfileSection(context, user),
+            
+            const SizedBox(height: 24),
             const Text(
               'Appearance',
               style: TextStyle(
@@ -44,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: const Text('Log Out'),
               leading: const Icon(Icons.logout),
-              onTap: () => dataService.logout(),
+              onTap: () => _handleLogout(context),
             ),
             const Divider(),
             const Text(
@@ -74,6 +82,74 @@ class SettingsScreen extends StatelessWidget {
     );
   }
   
+  Widget _buildProfileSection(BuildContext context, User user) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: user.photoURL != null ? NetworkImage(user.photoURL!) : null,
+              child: user.photoURL == null 
+                ? Text(
+                    user.displayName?.isNotEmpty == true 
+                      ? user.displayName![0].toUpperCase() 
+                      : (user.email?[0].toUpperCase() ?? 'U')
+                  )
+                : null,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.displayName ?? 'User',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user.email ?? '',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  void _handleLogout(BuildContext context) async {
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await authService.signOut();
+              dataService.logout(); // Also clear data service cache if needed
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+  
   String _getThemeModeName(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.light:
@@ -86,7 +162,7 @@ class SettingsScreen extends StatelessWidget {
   }
   
   void _showThemeOptions(BuildContext context) {
-    final dataService = Provider.of<DataService>(context, listen: false);
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     
     showDialog(
       context: context,
@@ -120,7 +196,7 @@ class SettingsScreen extends StatelessWidget {
   }
   
   void _showResetConfirmation(BuildContext context) {
-    final dataService = Provider.of<DataService>(context, listen: false);
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     
     showDialog(
       context: context,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
 import 'category_packs_screen.dart';
 import 'question_screen.dart';
 import '../widgets/pack_card.dart';
@@ -18,7 +18,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
+    final dataService = Provider.of<FirebaseDataService>(context);
     final allPacks = dataService.allQuestionPacks;
     
     // Get unique categories

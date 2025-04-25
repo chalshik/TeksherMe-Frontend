@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
 import 'question_screen.dart';
 import '../widgets/pack_card.dart';
 
@@ -37,7 +37,7 @@ class BookmarkedPacksTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
+    final dataService = Provider.of<FirebaseDataService>(context);
     final bookmarkedPacks = dataService.bookmarkedPacks;
     
     return Padding(
@@ -74,7 +74,7 @@ class BookmarkedQuestionsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
+    final dataService = Provider.of<FirebaseDataService>(context);
     final bookmarkedQuestions = dataService.bookmarkedQuestions;
     
     return Padding(

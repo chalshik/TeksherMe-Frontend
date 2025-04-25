@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
 import 'results_analysis_screen.dart';
 
 class QuestionScreen extends StatefulWidget {
@@ -20,63 +20,67 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   late QuestionPack pack;
   late int currentIndex;
+  bool isLoading = true;
   
   @override
   void initState() {
     super.initState();
-    final dataService = Provider.of<DataService>(context, listen: false);
+    _initPack();
+  }
+  
+  Future<void> _initPack() async {
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     pack = dataService.getPackById(widget.packId)!;
     
     if (widget.startFromBeginning) {
       currentIndex = 0;
-      // Defer state update to after the build is complete
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Reset answers when starting from beginning
-        dataService.resetPackAnswers(widget.packId);
-        dataService.startPack(widget.packId);
-        // Refresh UI after resetting answers
-        setState(() {
-          pack = dataService.getPackById(widget.packId)!;
-        });
-      });
+      firebase-service
+      await dataService.startPack(widget.packId);
     } else {
       currentIndex = pack.lastQuestionIndex;
-      // Defer state update to after the build is complete
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        dataService.continuePack(widget.packId);
+      await dataService.continuePack(widget.packId);
+    }
+    
+    if (mounted) {
+      setState(() {
+        isLoading = false;
       });
     }
   }
   
-  void _answerQuestion(int optionIndex) {
-    final dataService = Provider.of<DataService>(context, listen: false);
+  Future<void> _answerQuestion(int optionIndex) async {
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     final question = pack.questions[currentIndex];
     
-    dataService.answerQuestion(pack.id, question.id, optionIndex);
+    await dataService.answerQuestion(pack.id, question.id, optionIndex);
     
     // Wait a moment to show the result before moving to next question
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 1), () async {
       if (mounted) {
-        setState(() {
-          if (currentIndex < pack.questions.length - 1) {
+        if (currentIndex < pack.questions.length - 1) {
+          setState(() {
             currentIndex++;
-            dataService.updatePackProgress(pack.id, currentIndex);
-          } else {
-            // End of pack
-            dataService.updatePackProgress(pack.id, pack.questions.length);
+          });
+          await dataService.updatePackProgress(pack.id, currentIndex);
+        } else {
+          // End of pack
+          await dataService.updatePackProgress(pack.id, pack.questions.length);
+          if (mounted) {
             _showCompletionDialog();
           }
-        });
+        }
       }
     });
   }
   
-  void _toggleBookmark() {
-    final dataService = Provider.of<DataService>(context, listen: false);
+  Future<void> _toggleBookmark() async {
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     final question = pack.questions[currentIndex];
     
-    dataService.toggleQuestionBookmark(pack.id, question.id);
-    setState(() {});
+    await dataService.toggleQuestionBookmark(pack.id, question.id);
+    if (mounted) {
+      setState(() {});
+    }
   }
   
   void _showCompletionDialog() {
@@ -225,6 +229,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Loading...')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    
     if (currentIndex >= pack.questions.length) {
       return Scaffold(
         appBar: AppBar(title: Text(pack.title)),

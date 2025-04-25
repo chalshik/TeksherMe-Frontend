@@ -12,7 +12,20 @@
           "package_name": "com.anonymous.TeksherMe"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "520480110917-bjemjuuh5drc0jbsea3fkjc2pehetq2s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.TeksherMe",
+            "certificate_hash": "3e5ce15560ce0347c768054f57e44693af51312b"
+          }
+        },
+        {
+          "client_id": "520480110917-rq5raghjvkbpus8al6r4vm434uud00at.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDrcPh2R80-ZAYRip7w2cNpyBu8wbzUnYs"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520480110917-rq5raghjvkbpus8al6r4vm434uud00at.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

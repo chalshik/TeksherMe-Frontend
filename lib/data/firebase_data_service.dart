@@ -36,11 +36,14 @@ class QuestionPack {
   // Factory constructor to create a QuestionPack from Firestore data
   factory QuestionPack.fromFirestore(DocumentSnapshot doc, List<Question> questions) {
     final data = doc.data() as Map<String, dynamic>;
+    final categoryValue = data['category'] as String?;
+    final category = (categoryValue == null || categoryValue.isEmpty) ? 'General' : categoryValue;
+    
     return QuestionPack(
       id: doc.id,
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      category: data['category'] ?? '',
+      category: category,
       difficulty: data['difficulty'] ?? 'Medium',
       timeEstimate: data['timeEstimate'] ?? 15,
       questions: questions,

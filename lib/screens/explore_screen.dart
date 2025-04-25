@@ -63,102 +63,127 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
             const SizedBox(height: 16),
             
-            // Categories
-            Text(
-              'Categories',
-              style: Theme.of(context).textTheme.titleLarge,
+            // Categories - Now displayed vertically with full width
+            Expanded(
+              child: _searchQuery.isNotEmpty 
+                ? _buildSearchResults()
+                : _buildCategoriesAndInstructions(categories),
             ),
-            SizedBox(
-              height: 60,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                    child: ActionChip(
-                      label: Text(categories[index]),
-                      onPressed: () {
-                        // Show packs in this category
-                        _showPacksByCategory(context, categories[index]);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            
-            // Show search results if there's a search query
-            if (_searchQuery.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Text(
-                'Search Results',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: _searchResults.isEmpty
-                    ? const Center(
-                        child: Text('No matching packs found'),
-                      )
-                    : ListView.builder(
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          final pack = _searchResults[index];
-                          return PackCard(
-                            pack: pack,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => QuestionScreen(
-                                    packId: pack.id, 
-                                    startFromBeginning: pack.lastQuestionIndex == 0,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-              ),
-            ] else ...[
-              // Show instructions when no search or category is selected
-              const SizedBox(height: 16),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.search,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Search for packs or select a category',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Discover question packs by using the search bar\nor tapping on a category above',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
       ),
+    );
+  }
+  
+  Widget _buildSearchResults() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Search Results',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: _searchResults.isEmpty
+              ? const Center(
+                  child: Text('No matching packs found'),
+                )
+              : ListView.builder(
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    final pack = _searchResults[index];
+                    return PackCard(
+                      pack: pack,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => QuestionScreen(
+                              packId: pack.id, 
+                              startFromBeginning: pack.lastQuestionIndex == 0,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildCategoriesAndInstructions(List<String> categories) {
+    if (categories.isEmpty) {
+      return const Center(child: Text('No categories available'));
+    }
+    
+    return Column(
+      children: [
+        // Categories in vertical list with full width cards
+        Expanded(
+          child: ListView.builder(
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              // Different colors for different categories based on theme
+              final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+              
+              final List<Color> lightThemeColors = [
+                Colors.blue.shade100,
+                Colors.green.shade100,
+                Colors.orange.shade100,
+                Colors.purple.shade100,
+                Colors.red.shade100,
+                Colors.teal.shade100,
+              ];
+              
+              final List<Color> darkThemeColors = [
+                Colors.blue.shade900,
+                Colors.green.shade900,
+                Colors.orange.shade900,
+                Colors.purple.shade900,
+                Colors.red.shade900,
+                Colors.teal.shade900,
+              ];
+              
+              // Use modulo to cycle through colors
+              final cardColors = isDarkTheme ? darkThemeColors : lightThemeColors;
+              final cardColor = cardColors[index % cardColors.length];
+              
+              // Text color based on theme
+              final textColor = isDarkTheme ? Colors.white : Colors.black;
+              
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12.0),
+                elevation: 2,
+                color: cardColor,
+                child: InkWell(
+                  onTap: () => _showPacksByCategory(context, categories[index]),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            categories[index],
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios, size: 18, color: textColor),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      
+      ],
     );
   }
   

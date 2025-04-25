@@ -31,7 +31,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
       currentIndex = 0;
       // Defer state update to after the build is complete
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Reset answers when starting from beginning
+        dataService.resetPackAnswers(widget.packId);
         dataService.startPack(widget.packId);
+        // Refresh UI after resetting answers
+        setState(() {
+          pack = dataService.getPackById(widget.packId)!;
+        });
       });
     } else {
       currentIndex = pack.lastQuestionIndex;

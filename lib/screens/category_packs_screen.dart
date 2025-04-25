@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
-import 'question_screen.dart';
+import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
 
 class CategoryPacksScreen extends StatelessWidget {
@@ -33,9 +33,8 @@ class CategoryPacksScreen extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => QuestionScreen(
-                            packId: pack.id, 
-                            startFromBeginning: pack.lastQuestionIndex == 0,
+                          builder: (context) => TestPreviewScreen(
+                            packId: pack.id,
                           ),
                         ),
                       );

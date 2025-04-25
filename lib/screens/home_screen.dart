@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
-import 'question_screen.dart';
+import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -85,28 +85,13 @@ class HomeScreen extends StatelessWidget {
               Navigator.of(context).pop();
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => QuestionScreen(
+                  builder: (context) => TestPreviewScreen(
                     packId: pack.id,
-                    startFromBeginning: true,
                   ),
                 ),
               );
             },
-            child: const Text('Restart'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => QuestionScreen(
-                    packId: pack.id,
-                    startFromBeginning: false,
-                  ),
-                ),
-              );
-            },
-            child: const Text('Continue'),
+            child: const Text('Preview'),
           ),
         ],
       ),

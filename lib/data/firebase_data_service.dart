@@ -462,8 +462,14 @@ class FirebaseDataService extends ChangeNotifier {
     if (pack != null) {
       for (final question in pack.questions) {
         if (question.id == questionId) {
-          question.isAnswered = true;
-          question.selectedOptionIndex = selectedOption;
+          // If selectedOption is -1, that means the question was skipped
+          if (selectedOption == -1) {
+            question.isAnswered = true;
+            question.selectedOptionIndex = null;
+          } else {
+            question.isAnswered = true;
+            question.selectedOptionIndex = selectedOption;
+          }
           
           // Save the progress
           await _saveUserProgress(packId);
@@ -523,6 +529,23 @@ class FirebaseDataService extends ChangeNotifier {
         
         notifyListeners();
       }
+    }
+  }
+  
+  // Logout function
+  Future<void> logout() async {
+    try {
+      await _authService.signOut();
+      
+      // Clear user data from memory
+      _questionPacks.clear();
+      
+      // Reload initial data as anonymous user
+      await _loadQuestionPacks();
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error logging out: $e');
     }
   }
   

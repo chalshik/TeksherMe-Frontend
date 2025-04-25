@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
 import 'category_packs_screen.dart';
-import 'question_screen.dart';
+import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -110,9 +110,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => QuestionScreen(
+                                  builder: (context) => TestPreviewScreen(
                                     packId: pack.id, 
-                                    startFromBeginning: pack.lastQuestionIndex == 0,
                                   ),
                                 ),
                               );

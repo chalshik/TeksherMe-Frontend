@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../data/data_service.dart';
+import '../data/firebase_data_service.dart';
 
 class PackCard extends StatelessWidget {
   final QuestionPack pack;
@@ -14,7 +14,7 @@ class PackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dataService = Provider.of<DataService>(context);
+    final dataService = Provider.of<FirebaseDataService>(context);
     
     return Card(
       margin: const EdgeInsets.only(bottom: 16),

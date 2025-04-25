@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
 import 'results_analysis_screen.dart';
+import 'test_preview_screen.dart';
 
 class QuestionScreen extends StatefulWidget {
   final String packId;
@@ -22,10 +24,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
   late int currentIndex;
   bool isLoading = true;
   
+  // Timer variables
+  Timer? _timer;
+  int _secondsRemaining = 0;
+  bool _isTimeLimited = false;
+  
   @override
   void initState() {
     super.initState();
     _initPack();
+  }
+  
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
   
   Future<void> _initPack() async {
@@ -35,15 +48,82 @@ class _QuestionScreenState extends State<QuestionScreen> {
     if (widget.startFromBeginning) {
       currentIndex = 0;
       await dataService.startPack(widget.packId);
+      
+      // Initialize timer when starting from beginning
+      if (pack.timeEstimate > 0) {
+        _isTimeLimited = true;
+        _secondsRemaining = pack.timeEstimate * 60; // Convert minutes to seconds
+        _startTimer();
+      }
     } else {
       currentIndex = pack.lastQuestionIndex;
       await dataService.continuePack(widget.packId);
+      
+      // For continued tests, we scale the remaining time based on the remaining questions
+      if (pack.timeEstimate > 0) {
+        _isTimeLimited = true;
+        final questionsRemaining = pack.questions.length - currentIndex;
+        final percentRemaining = questionsRemaining / pack.questions.length;
+        _secondsRemaining = (pack.timeEstimate * 60 * percentRemaining).round();
+        _startTimer();
+      }
     }
     
     if (mounted) {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+  
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining > 0) {
+        setState(() {
+          _secondsRemaining--;
+        });
+      } else {
+        _timer?.cancel();
+        _showTimeUpDialog();
+      }
+    });
+  }
+  
+  void _showTimeUpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Time\'s Up!'),
+        content: const Text('Your time for this test has ended.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _submitTest();
+            },
+            child: const Text('View Results'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _submitTest() async {
+    final dataService = Provider.of<FirebaseDataService>(context, listen: false);
+    
+    // Mark remaining questions as unanswered
+    for (int i = currentIndex; i < pack.questions.length; i++) {
+      if (!pack.questions[i].isAnswered) {
+        // We use -1 to indicate that the question was not answered
+        await dataService.answerQuestion(pack.id, pack.questions[i].id, -1);
+      }
+    }
+    
+    await dataService.updatePackProgress(pack.id, pack.questions.length);
+    
+    if (mounted) {
+      _showCompletionDialog();
     }
   }
   
@@ -83,6 +163,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
   }
   
   void _showCompletionDialog() {
+    // Cancel timer when showing completion dialog
+    _timer?.cancel();
+    
     final correctAnswers = pack.questions.where((q) => q.isAnswered && q.isCorrect).length;
     final totalQuestions = pack.questions.length;
     final percentage = (correctAnswers / totalQuestions * 100).toInt();
@@ -174,9 +257,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     Navigator.of(context).pop(); // Close bottom sheet
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => QuestionScreen(
+                        builder: (context) => TestPreviewScreen(
                           packId: pack.id,
-                          startFromBeginning: true,
                         ),
                       ),
                     );
@@ -225,6 +307,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
       ),
     );
   }
+  
+  String _formatTimeRemaining() {
+    final minutes = (_secondsRemaining / 60).floor();
+    final seconds = _secondsRemaining % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,6 +336,31 @@ class _QuestionScreenState extends State<QuestionScreen> {
       appBar: AppBar(
         title: Text(pack.title),
         actions: [
+          if (_isTimeLimited) ...[
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _secondsRemaining < 60 ? Colors.red[100] : Colors.grey[200],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.timer, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatTimeRemaining(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: _secondsRemaining < 60 ? Colors.red : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           IconButton(
             icon: Icon(
               question.isBookmarked ? Icons.bookmark : Icons.bookmark_border,

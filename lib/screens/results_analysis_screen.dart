@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/firebase_data_service.dart';
-import 'question_screen.dart';
+import 'test_preview_screen.dart';
 
 class ResultsAnalysisScreen extends StatelessWidget {
   final QuestionPack pack;
@@ -24,9 +24,8 @@ class ResultsAnalysisScreen extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (context) => QuestionScreen(
+                  builder: (context) => TestPreviewScreen(
                     packId: pack.id,
-                    startFromBeginning: true,
                   ),
                 ),
               );

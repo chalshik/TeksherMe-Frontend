@@ -1,4 +1,4 @@
-#Fri Apr 25 12:55:41 KGT 2025
+#Fri Apr 25 13:12:46 KGT 2025
 base.0=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.2=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex

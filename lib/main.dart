@@ -50,7 +50,24 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      darkTheme: ThemeData.dark(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF9E77ED),
+          secondary: Color(0xFF626EEF),
+          surface: Color(0xFF1E1E1E),
+          background: Color(0xFF121212),
+          error: Color(0xFFCF6679),
+        ),
+        cardTheme: const CardTheme(
+          color: Color(0xFF2C2C2C),
+        ),
+        chipTheme: const ChipThemeData(
+          backgroundColor: Color(0xFF3A3A3A),
+          selectedColor: Color(0xFF9E77ED),
+          labelStyle: TextStyle(color: Colors.white),
+          secondaryLabelStyle: TextStyle(color: Colors.white),
+        ),
+      ),
       home: const AuthWrapper(),
     );
   }

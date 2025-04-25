@@ -4,7 +4,7 @@
             "outputFile": "com.example.teksherme_flutter.app-mergeDebugResources-27:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "/home/bekbolsun/Projects/TeksherMe-Frontend/android/app/src/main/res/values-night/styles.xml",
+                    "source": "/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

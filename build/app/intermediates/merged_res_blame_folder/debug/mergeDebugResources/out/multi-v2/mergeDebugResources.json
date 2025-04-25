@@ -846,7 +846,7 @@
             "outputFile": "com.example.teksherme_flutter.app-debug-29:/values-night-v8_values-night-v8.arsc.flat",
             "map": [
                 {
-                    "source": "/home/bekbolsun/Projects/TeksherMe-Frontend/android/app/src/main/res/values-night/styles.xml",
+                    "source": "/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
@@ -2461,25 +2461,6 @@
                     }
                 },
                 {
-                    "source": "/home/bekbolsun/Projects/TeksherMe-Frontend/android/app/src/main/res/values/styles.xml",
-                    "from": {
-                        "startLines": "3,14",
-                        "startColumns": "4,4",
-                        "startOffsets": "173,818",
-                        "endLines": "7,16",
-                        "endColumns": "12,12",
-                        "endOffsets": "476,982"
-                    },
-                    "to": {
-                        "startLines": "192,196",
-                        "startColumns": "4,4",
-                        "startOffsets": "11691,11872",
-                        "endLines": "195,198",
-                        "endColumns": "12,12",
-                        "endOffsets": "11867,12036"
-                    }
-                },
-                {
                     "source": "/home/bekbolsun/.gradle/caches/8.10.2/transforms/55520e4df2220e27f13f0bbb7467d11a/transformed/fragment-1.7.1/res/values/values.xml",
                     "from": {
                         "startLines": "2,3,4,5,10",
@@ -2602,6 +2583,25 @@
                         "startOffsets": "7035,8044",
                         "endColumns": "41,59",
                         "endOffsets": "7072,8099"
+                    }
+                },
+                {
+                    "source": "/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/android/app/src/main/res/values/styles.xml",
+                    "from": {
+                        "startLines": "3,14",
+                        "startColumns": "4,4",
+                        "startOffsets": "173,818",
+                        "endLines": "7,16",
+                        "endColumns": "12,12",
+                        "endOffsets": "476,982"
+                    },
+                    "to": {
+                        "startLines": "192,196",
+                        "startColumns": "4,4",
+                        "startOffsets": "11691,11872",
+                        "endLines": "195,198",
+                        "endColumns": "12,12",
+                        "endOffsets": "11867,12036"
                     }
                 }
             ]

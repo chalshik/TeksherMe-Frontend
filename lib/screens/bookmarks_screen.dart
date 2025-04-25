@@ -61,9 +61,47 @@ class BookmarkedPacksTab extends StatelessWidget {
                       ),
                     );
                   },
+                  onBookmarkTap: () {
+                    _showUnbookmarkConfirmation(
+                      context, 
+                      'Remove Bookmark', 
+                      'Are you sure you want to remove this pack from your bookmarks?',
+                      () => dataService.togglePackBookmark(pack.id)
+                    );
+                  },
                 );
               },
             ),
+    );
+  }
+  
+  void _showUnbookmarkConfirmation(
+    BuildContext context, 
+    String title, 
+    String message, 
+    VoidCallback onConfirm
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onConfirm();
+            },
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -86,6 +124,19 @@ class BookmarkedQuestionsTab extends StatelessWidget {
               itemCount: bookmarkedQuestions.length,
               itemBuilder: (context, index) {
                 final question = bookmarkedQuestions[index];
+                
+                // Find the pack this question belongs to
+                String? packId;
+                for (final pack in dataService.allTestSets) {
+                  for (final q in pack.questions) {
+                    if (q.id == question.id) {
+                      packId = pack.id;
+                      break;
+                    }
+                  }
+                  if (packId != null) break;
+                }
+                
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
                   child: Padding(
@@ -93,12 +144,36 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          question.text,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        // Question text with bookmark button
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                question.text,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            if (packId != null)
+                              IconButton(
+                                icon: const Icon(Icons.bookmark, color: Colors.blue),
+                                onPressed: () {
+                                  _showUnbookmarkConfirmation(
+                                    context, 
+                                    'Remove Bookmark', 
+                                    'Are you sure you want to remove this question from your bookmarks?',
+                                    () => dataService.toggleQuestionBookmark(packId!, question.id)
+                                  );
+                                },
+                                tooltip: 'Remove bookmark',
+                                constraints: const BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                                iconSize: 22,
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         ...List.generate(
@@ -134,7 +209,7 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Expanded(child: Text(question.options[i])),
+                                Expanded(child: Text(question.options[i].toString())),
                               ],
                             ),
                           ),
@@ -145,6 +220,36 @@ class BookmarkedQuestionsTab extends StatelessWidget {
                 );
               },
             ),
+    );
+  }
+  
+  void _showUnbookmarkConfirmation(
+    BuildContext context, 
+    String title, 
+    String message, 
+    VoidCallback onConfirm
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onConfirm();
+            },
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
     );
   }
 } 

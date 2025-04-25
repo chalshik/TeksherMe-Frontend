@@ -1,10 +1,10 @@
-#Fri Apr 25 16:47:44 KGT 2025
-base.0=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeExtDexDebug/classes.dex
-base.1=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeLibDexDebug/0/classes.dex
-base.2=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
-base.3=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
-base.4=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/9/classes.dex
-base.5=/home/bekbolsun/Projects/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
+#Sat Apr 26 00:53:08 KGT 2025
+base.0=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+base.1=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeLibDexDebug/0/classes.dex
+base.2=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.3=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
+base.4=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeProjectDexDebug/9/classes.dex
+base.5=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=0/classes.dex

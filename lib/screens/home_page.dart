@@ -5,14 +5,22 @@ import 'bookmarks_screen.dart';
 import 'settings_screen.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int initialIndex;
+  
+  const HomePage({super.key, this.initialIndex = 0});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+  
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
   
   static const List<Widget> _screens = [
     HomeScreen(),

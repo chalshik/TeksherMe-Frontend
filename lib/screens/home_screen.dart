@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(pack.title),
+        title: Text(pack.name),
         content: const Text('Would you like to continue where you left off or restart?'),
         actions: [
           TextButton(

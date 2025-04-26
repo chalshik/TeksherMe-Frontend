@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
 import '../service/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'auth_wrapper.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -142,6 +143,14 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pop(context);
               await authService.signOut();
               dataService.logout(); // Also clear data service cache if needed
+              
+              // Navigate back to the root context and rebuild from AuthWrapper
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const AuthWrapper()),
+                  (route) => false,
+                );
+              }
             },
             child: const Text('Logout'),
           ),

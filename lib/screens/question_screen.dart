@@ -61,12 +61,20 @@ class _QuestionScreenState extends State<QuestionScreen> {
       currentIndex = pack.lastQuestionIndex;
       await dataService.continuePack(widget.packId);
       
-      // For continued tests, we scale the remaining time based on the remaining questions
+      // For continued tests, use the saved remaining time if available
       if (pack.timeEstimate > 0) {
         _isTimeLimited = true;
-        final questionsRemaining = pack.questions.length - currentIndex;
-        final percentRemaining = questionsRemaining / pack.questions.length;
-        _secondsRemaining = (pack.timeEstimate * 60 * percentRemaining).round();
+        
+        if (pack.remainingSeconds != null) {
+          // Use the saved remaining time
+          _secondsRemaining = pack.remainingSeconds!;
+        } else {
+          // Fallback to calculating based on remaining questions
+          final questionsRemaining = pack.questions.length - currentIndex;
+          final percentRemaining = questionsRemaining / pack.questions.length;
+          _secondsRemaining = (pack.timeEstimate * 60 * percentRemaining).round();
+        }
+        
         _startTimer();
       }
     }
@@ -734,7 +742,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
     final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     
     // Even if on first question, mark as "in progress"
-    await dataService.updatePackProgress(pack.id, currentIndex);
+    // Also save the remaining time
+    await dataService.updatePackProgress(
+      pack.id, 
+      currentIndex,
+      remainingSeconds: _secondsRemaining,
+    );
     
     // Navigate to the HomePage with Explore tab
     if (mounted) {

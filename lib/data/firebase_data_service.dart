@@ -77,7 +77,9 @@ class TestSet {
   final List<Question> questions;
   bool isBookmarked;
   int lastQuestionIndex;
+  bool isStarted;
   bool isCompleted;
+  int? remainingSeconds; // Added to store the remaining time when user quits
 
   TestSet({
     required this.id,
@@ -89,7 +91,9 @@ class TestSet {
     required this.questions,
     this.isBookmarked = false,
     this.lastQuestionIndex = 0,
+    this.isStarted = false,
     this.isCompleted = false,
+    this.remainingSeconds,
   });
 
   double get progressPercentage {
@@ -140,7 +144,7 @@ class FirebaseDataService extends ChangeNotifier {
   List<Category> get allCategories => _categories;
   
   List<TestSet> get inProgressTestSets => _testSets
-      .where((test) => test.lastQuestionIndex > 0 && !test.isCompleted)
+      .where((test) => test.isStarted && !test.isCompleted)
       .toList();
 
   List<TestSet> get bookmarkedTestSets => 
@@ -271,7 +275,9 @@ class FirebaseDataService extends ChangeNotifier {
     for (final testSet in _testSets) {
       testSet.isBookmarked = false;
       testSet.lastQuestionIndex = 0;
+      testSet.isStarted = false;
       testSet.isCompleted = false;
+      testSet.remainingSeconds = null;
       
       for (final question in testSet.questions) {
         question.isBookmarked = false;
@@ -313,32 +319,6 @@ class FirebaseDataService extends ChangeNotifier {
       
       final categorySnapshot = await _firestore.collection('categories').get();
       
-      // Create default categories if none exist - but only if the user is admin
-      // For most users, categories should already exist
-      if (categorySnapshot.docs.isEmpty && _auth.currentUser != null) {
-        try {
-          await _createDefaultCategories();
-          // Reload categories
-          final newSnapshot = await _firestore.collection('categories').get();
-          for (final doc in newSnapshot.docs) {
-            final data = doc.data();
-            _categories.add(Category(
-              id: doc.id,
-              name: data['name'] ?? 'General',
-            ));
-          }
-        } catch (e) {
-          print('Failed to create default categories: $e');
-          // Add a placeholder category if we can't create them
-          _categories.add(Category(
-            id: 'default',
-            name: 'General',
-          ));
-        }
-        return;
-      }
-      
-      // Normal case - categories exist
       for (final doc in categorySnapshot.docs) {
         final data = doc.data();
         _categories.add(Category(
@@ -347,38 +327,11 @@ class FirebaseDataService extends ChangeNotifier {
         ));
       }
       
-      // If still no categories, add at least one default one in memory
-      if (_categories.isEmpty) {
-        _categories.add(Category(
-          id: 'default',
-          name: 'General',
-        ));
-      }
-    } catch (e) {
+      
+    } 
+    //NO NEED TO LOAD DEFAULT CATEGORIES
+    catch (e) {
       print('Error loading categories: $e');
-      // Always ensure at least one category exists
-      _categories.add(Category(
-        id: 'default',
-        name: 'General',
-      ));
-    }
-  }
-  
-  Future<void> _createDefaultCategories() async {
-    final defaultCategories = [
-      'Programming',
-      'Mathematics',
-      'Geography',
-      'History',
-      'Science',
-      'General',
-    ];
-    
-    for (final categoryName in defaultCategories) {
-      await _firestore.collection('categories').add({
-        'name': categoryName,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
     }
   }
   
@@ -545,6 +498,12 @@ class FirebaseDataService extends ChangeNotifier {
           if (testSet != null) {
             testSet.lastQuestionIndex = data['lastQuestionIndex'] ?? 0;
             testSet.isCompleted = data['isCompleted'] ?? false;
+            testSet.isStarted = data['isStarted'] ?? false;
+            
+            // Load remaining seconds if available
+            if (data['remainingSeconds'] != null) {
+              testSet.remainingSeconds = data['remainingSeconds'] as int;
+            }
             
             // Load user answers
             await _loadUserAnswers(testSet, data['attemptId'] as String?);
@@ -678,6 +637,7 @@ class FirebaseDataService extends ChangeNotifier {
     final testSet = getTestSetById(testSetId);
     if (testSet != null) {
       testSet.lastQuestionIndex = 0;
+      testSet.isStarted = true;
       testSet.isCompleted = false;
       
       // Create a new test attempt
@@ -709,12 +669,21 @@ class FirebaseDataService extends ChangeNotifier {
   }
   
   Future<void> continueTestSet(String testSetId) async {
-    notifyListeners();
-  }
-  
-  Future<void> updateTestProgress(String testSetId, int questionIndex) async {
     final testSet = getTestSetById(testSetId);
     if (testSet != null) {
+      testSet.isStarted = true;
+      
+      // No need to update Firestore since this is just continuing a test
+      // that should already be marked as started
+      
+      notifyListeners();
+    }
+  }
+  
+  Future<void> updateTestProgress(String testSetId, int questionIndex, {int? remainingSeconds}) async {
+    final testSet = getTestSetById(testSetId);
+    if (testSet != null) {
+      testSet.isStarted = true;
       testSet.lastQuestionIndex = questionIndex;
       final isCompleted = questionIndex >= testSet.questions.length;
       
@@ -722,12 +691,12 @@ class FirebaseDataService extends ChangeNotifier {
         testSet.isCompleted = true;
       }
       
-      await _updateTestProgress(testSetId, questionIndex, isCompleted, null);
+      await _updateTestProgress(testSetId, questionIndex, isCompleted, null, remainingSeconds: remainingSeconds);
       notifyListeners();
     }
   }
   
-  Future<void> _updateTestProgress(String testSetId, int questionIndex, bool isCompleted, String? attemptId) async {
+  Future<void> _updateTestProgress(String testSetId, int questionIndex, bool isCompleted, String? attemptId, {int? remainingSeconds}) async {
     if (_auth.currentUser == null) return;
     
     try {
@@ -741,11 +710,19 @@ class FirebaseDataService extends ChangeNotifier {
       final String effectiveAttemptId = attemptId ?? 
           (progressDoc.exists ? (progressDoc.data()?['attemptId'] as String? ?? '') : '');
       
+      // Update testSet in memory
+      final testSet = getTestSetById(testSetId);
+      if (testSet != null && remainingSeconds != null) {
+        testSet.remainingSeconds = remainingSeconds;
+      }
+      
       await _firestore.collection('test_progress').doc('${currentUserId}_$testSetId').set({
         'userId': currentUserId,
         'testSetId': testSetId,
         'lastQuestionIndex': questionIndex,
+        'isStarted': true,
         'isCompleted': isCompleted,
+        'remainingSeconds': remainingSeconds, // Store remaining time
         'attemptId': effectiveAttemptId,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -758,6 +735,14 @@ class FirebaseDataService extends ChangeNotifier {
         });
       }
     } catch (e) {
+      // Update in memory even if Firestore fails
+      final testSet = getTestSetById(testSetId);
+      if (testSet != null) {
+        testSet.isStarted = true;
+        if (remainingSeconds != null) {
+          testSet.remainingSeconds = remainingSeconds;
+        }
+      }
       print('Error updating test progress: $e');
     }
   }
@@ -901,6 +886,8 @@ class FirebaseDataService extends ChangeNotifier {
         testSet.lastQuestionIndex = 0;
         testSet.isCompleted = false;
         testSet.isBookmarked = false;
+        testSet.isStarted = false;
+        testSet.remainingSeconds = null;
         
         for (final question in testSet.questions) {
           question.isAnswered = false;
@@ -956,7 +943,9 @@ class FirebaseDataService extends ChangeNotifier {
       if (testSet != null) {
         // Reset progress in memory
         testSet.lastQuestionIndex = 0;
+        testSet.isStarted = false;
         testSet.isCompleted = false;
+        testSet.remainingSeconds = null;
         
         for (final question in testSet.questions) {
           question.isAnswered = false;
@@ -1023,7 +1012,8 @@ class FirebaseDataService extends ChangeNotifier {
   // QuestionPack compatibility methods
   Future<void> startPack(String packId) => startTestSet(packId);
   Future<void> continuePack(String packId) => continueTestSet(packId);
-  Future<void> updatePackProgress(String packId, int questionIndex) => updateTestProgress(packId, questionIndex);
+  Future<void> updatePackProgress(String packId, int questionIndex, {int? remainingSeconds}) => 
+      updateTestProgress(packId, questionIndex, remainingSeconds: remainingSeconds);
   Future<void> togglePackBookmark(String packId) => toggleTestSetBookmark(packId);
   TestSet? getPackById(String id) => getTestSetById(id);
   

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.teksherme_flutter.app-mergeDebugResources-27:/values-en-rIN/values-en-rIN.xml",
+            "outputFile": "com.example.teksherme_flutter.app-mergeDebugResources-28:/values-en-rIN/values-en-rIN.xml",
             "map": [
                 {
                     "source": "/home/bekbolsun/.gradle/caches/8.10.2/transforms/f8742dbdd8ad548bbf5dde49a0ea9a7d/transformed/browser-1.4.0/res/values-en-rIN/values-en-rIN.xml",

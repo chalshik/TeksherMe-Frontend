@@ -22,16 +22,11 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Welcome to TeksherMe',
+              'Continue Where You Left Off',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Continue Where You Left Off',
-              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             Expanded(

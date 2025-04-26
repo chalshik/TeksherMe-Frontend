@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "520480110917",
+    "project_id": "teksherme-3a2fe",
+    "storage_bucket": "teksherme-3a2fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520480110917:android:fccc2b60a4919e6ea9662c",
+        "android_client_info": {
+          "package_name": "com.anonymous.TeksherMe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520480110917-bjemjuuh5drc0jbsea3fkjc2pehetq2s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.TeksherMe",
+            "certificate_hash": "3e5ce15560ce0347c768054f57e44693af51312b"
+          }
+        },
+        {
+          "client_id": "520480110917-cdf5b0rp99bepppe3tghm9pil36lvb7o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.TeksherMe",
+            "certificate_hash": "4952ba40316e86f8ac89336d56db10231eb120b1"
+          }
+        },
+        {
+          "client_id": "520480110917-rq5raghjvkbpus8al6r4vm434uud00at.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrcPh2R80-ZAYRip7w2cNpyBu8wbzUnYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520480110917-rq5raghjvkbpus8al6r4vm434uud00at.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

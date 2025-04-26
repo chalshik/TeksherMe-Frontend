@@ -100,7 +100,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   categories[index],
-                  style: const TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 22),
                   textAlign: TextAlign.left,
                 ),
               ),

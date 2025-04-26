@@ -70,19 +70,39 @@ class TestPreviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with title, difficulty
+            // Header with title and description
             Container(
               padding: const EdgeInsets.all(16),
+              width: double.infinity,
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark 
                     ? Colors.grey[850] 
-                    : Colors.grey[50],
+                    : Colors.blue[50],
                 borderRadius: BorderRadius.circular(12),
+                gradient: Theme.of(context).brightness == Brightness.dark 
+                    ? null
+                    : LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.blue[50]!,
+                          Colors.blue[100]!.withOpacity(0.5),
+                        ],
+                      ),
+                boxShadow: Theme.of(context).brightness == Brightness.dark 
+                    ? null 
+                    : [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                     // Test title
+                  // Test title
                   Text(
                     pack.name,
                     style: const TextStyle(
@@ -134,64 +154,72 @@ class TestPreviewScreen extends StatelessWidget {
               ],
             ),
             
-            // Status card
-            const SizedBox(height: 24),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Test Status',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          _getStatusIcon(status),
-                          size: 18,
-                          color: statusColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          status,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+            // Status card (only show if in progress or completed)
+            if (pack.isStarted || pack.isCompleted) ...[
+              const SizedBox(height: 24),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? null 
+                    : Colors.white,
+                shadowColor: Theme.of(context).brightness == Brightness.dark 
+                    ? null 
+                    : Colors.blue.withOpacity(0.2),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            _getStatusIcon(status),
+                            size: 18,
                             color: statusColor,
-                            fontSize: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            status,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: statusColor,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
+                        const SizedBox(height: 12),
+                        LinearProgressIndicator(
+                          value: pack.progressPercentage,
+                          borderRadius: BorderRadius.circular(4),
+                          minHeight: 8,
+                          backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                              ? null 
+                              : Colors.blue.withOpacity(0.1),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).brightness == Brightness.dark 
+                                ? Theme.of(context).colorScheme.primary 
+                                : Colors.blue,
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Progress: ${(pack.progressPercentage * 100).toInt()}% (${pack.lastQuestionIndex}/${pack.questions.length} questions)',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ],
-                    ),
-                    
-                    if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
-                      const SizedBox(height: 12),
-                      LinearProgressIndicator(
-                        value: pack.progressPercentage,
-                        borderRadius: BorderRadius.circular(4),
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Progress: ${(pack.progressPercentage * 100).toInt()}% (${pack.lastQuestionIndex}/${pack.questions.length} questions)',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
             
-            // Action buttons
+            // Action button
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
@@ -210,13 +238,16 @@ class TestPreviewScreen extends StatelessWidget {
                         ),
                       );
                     });
+                  } else if (pack.lastQuestionIndex > 0) {
+                    // For in-progress tests, show a continue/restart dialog
+                    _showContinueRestartDialog(context, dataService, pack);
                   } else {
-                    // Continue or start new test
+                    // Start new test
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => QuestionScreen(
                           packId: pack.id,
-                          startFromBeginning: pack.lastQuestionIndex == 0,
+                          startFromBeginning: true,
                         ),
                       ),
                     );
@@ -225,18 +256,26 @@ class TestPreviewScreen extends StatelessWidget {
                 icon: Icon(
                   pack.isCompleted
                       ? Icons.refresh
-                      : (pack.lastQuestionIndex > 0 ? Icons.play_circle_filled : Icons.play_arrow)
+                      : Icons.play_arrow
                 ),
                 label: Text(
                   pack.isCompleted
                       ? 'Restart Test'
-                      : (pack.lastQuestionIndex > 0 && !pack.isCompleted ? 'Continue Test' : 'Start Test'),
+                      : 'Start Test',
                   style: const TextStyle(fontSize: 18),
                 ),
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                      ? null 
+                      : Colors.blue,
+                  foregroundColor: Colors.white,
+                  elevation: 3,
+                  shadowColor: Theme.of(context).brightness == Brightness.dark 
+                      ? null 
+                      : Colors.blue.withOpacity(0.4),
                 ),
               ),
             ),
@@ -342,6 +381,52 @@ class TestPreviewScreen extends StatelessWidget {
       return '${time.toStringAsFixed(1)} min';
     }
   }
+
+  void _showContinueRestartDialog(
+    BuildContext context,
+    FirebaseDataService dataService,
+    TestSet pack
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Continue or Restart Test'),
+        content: Text('Do you want to continue from where you left off or restart the test?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              dataService.resetTestProgress(pack.id).then((_) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => QuestionScreen(
+                      packId: pack.id,
+                      startFromBeginning: true,
+                    ),
+                  ),
+                );
+              });
+            },
+            child: const Text('Restart'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => QuestionScreen(
+                    packId: pack.id,
+                    startFromBeginning: false,
+                  ),
+                ),
+              );
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // Small info card widget
@@ -360,13 +445,31 @@ class _InfoCard extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final isLightMode = Theme.of(context).brightness == Brightness.light;
+    
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark 
             ? Colors.grey[850] 
-            : Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
+            : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        gradient: isLightMode ? LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            Colors.blue.shade50,
+          ],
+          stops: const [0.6, 1.0],
+        ) : null,
+        boxShadow: isLightMode ? [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ] : null,
       ),
       child: Column(
         children: [

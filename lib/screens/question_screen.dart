@@ -500,11 +500,17 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   color: _secondsRemaining < 60 
                       ? Theme.of(context).brightness == Brightness.dark 
                           ? Colors.red.withOpacity(0.3) 
-                          : Colors.red[100]
+                          : Color(0xFFFFEBEE) // Light red background
                       : Theme.of(context).brightness == Brightness.dark 
                           ? Theme.of(context).colorScheme.surface
-                          : Colors.grey[200],
+                          : Color(0xFFE3F2FD), // Light blue background
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: _secondsRemaining < 60 
+                        ? Colors.red.withOpacity(0.3) 
+                        : Colors.blue.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -539,7 +545,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
               value: (currentIndex + 1) / pack.questions.length,
               backgroundColor: Theme.of(context).brightness == Brightness.dark 
                   ? Colors.grey.shade800 
-                  : Colors.grey[200],
+                  : Colors.blue.withOpacity(0.1),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.blue,
+              ),
+              minHeight: 8,
+              borderRadius: BorderRadius.circular(4),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -558,7 +571,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             
             // Answer options
             Expanded(
@@ -573,20 +586,39 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   if (isSelected) {
                     cardColor = Theme.of(context).brightness == Brightness.dark 
                         ? Theme.of(context).colorScheme.primary.withOpacity(0.2) 
-                        : Theme.of(context).colorScheme.primary.withOpacity(0.1);
+                        : Color(0xFFE3F2FD); // Light blue background for selected option
                   }
                   
                   return Card(
                     color: cardColor,
-                    margin: const EdgeInsets.only(bottom: 8),
+                    elevation: isSelected ? 2 : 1,
+                    shadowColor: isSelected 
+                        ? Colors.blue.withOpacity(0.3) 
+                        : Colors.black.withOpacity(0.1),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: isSelected 
+                          ? BorderSide(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                              width: 1.5,
+                            ) 
+                          : BorderSide.none,
+                    ),
                     child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       leading: CircleAvatar(
                         backgroundColor: isSelected
                             ? Theme.of(context).colorScheme.primary
                             : (Theme.of(context).brightness == Brightness.dark
                                 ? Colors.grey[700]
                                 : Colors.grey[300]),
-                        foregroundColor: Colors.white,
+                        foregroundColor: isSelected || Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
                         child: Text(String.fromCharCode(65 + index)),
                       ),
                       title: Text(option.toString()),
@@ -605,18 +637,23 @@ class _QuestionScreenState extends State<QuestionScreen> {
               ),
             ),
             
-            // Add pagination controls at the bottom with finish button
+            // Pagination controls (positioned after answers but not at bottom)
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Back button (disabled on first question)
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: currentIndex > 0 
                       ? () => _navigateToQuestion(currentIndex - 1) 
                       : null,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Back'),
+                  child: const Text(
+                    '<<',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).brightness == Brightness.dark
                         ? Colors.grey[800]
@@ -624,6 +661,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     foregroundColor: Theme.of(context).brightness == Brightness.dark
                         ? Colors.white
                         : Colors.black87,
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ),
                 
@@ -636,16 +677,25 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
                 
                 // Next button (disabled on last question)
-                ElevatedButton.icon(
+                ElevatedButton(
                   onPressed: currentIndex < pack.questions.length - 1
                       ? () => _navigateToQuestion(currentIndex + 1)
                       : null,
-                  icon: const Icon(Icons.arrow_forward),
-                  label: const Text('Next'),
+                  child: const Text(
+                    '>>',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).brightness == Brightness.dark
                         ? Colors.grey[800]
@@ -653,10 +703,15 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     foregroundColor: Theme.of(context).brightness == Brightness.dark
                         ? Colors.white
                         : Colors.black87,
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

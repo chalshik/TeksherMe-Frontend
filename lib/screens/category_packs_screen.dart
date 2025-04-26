@@ -16,7 +16,10 @@ class CategoryPacksScreen extends StatelessWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(category),
+        title: Text(
+          category,
+          style: const TextStyle(fontSize: 22),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

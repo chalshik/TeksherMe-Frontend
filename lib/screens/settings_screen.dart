@@ -27,49 +27,46 @@ class SettingsScreen extends StatelessWidget {
             if (user != null) _buildProfileSection(context, user),
             
             const SizedBox(height: 24),
-            const Text(
-              'Appearance',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            
+            // Settings list
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 1,
+              margin: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(_getThemeModeName(dataService.themeMode)),
+                    leading: Icon(
+                      dataService.themeMode == ThemeMode.light 
+                        ? Icons.light_mode
+                        : dataService.themeMode == ThemeMode.dark
+                          ? Icons.dark_mode
+                          : MediaQuery.of(context).platformBrightness == Brightness.light
+                            ? Icons.light_mode
+                            : Icons.dark_mode,
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => _showThemeOptions(context),
+                  ),
+                  const Divider(height: 1, indent: 56),
+                  ListTile(
+                    title: const Text('Reset Progress'),
+                    leading: const Icon(Icons.refresh),
+                    onTap: () => _showResetConfirmation(context),
+                  ),
+                  const Divider(height: 1, indent: 56),
+                  ListTile(
+                    title: const Text('Log Out'),
+                    leading: const Icon(Icons.logout),
+                    onTap: () => _handleLogout(context),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            ListTile(
-              title: const Text('Theme'),
-              subtitle: Text(_getThemeModeName(dataService.themeMode)),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () => _showThemeOptions(context),
-            ),
-            const Divider(),
-            const Text(
-              'Account',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              title: const Text('Log Out'),
-              leading: const Icon(Icons.logout),
-              onTap: () => _handleLogout(context),
-            ),
-            const Divider(),
-            const Text(
-              'Data',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              title: const Text('Reset Progress'),
-              leading: const Icon(Icons.refresh),
-              onTap: () => _showResetConfirmation(context),
-            ),
-            const Divider(),
+            
             const Spacer(),
             Center(
               child: Text(
@@ -175,31 +172,84 @@ class SettingsScreen extends StatelessWidget {
     
     showDialog(
       context: context,
-      builder: (context) => SimpleDialog(
+      builder: (context) => AlertDialog(
         title: const Text('Choose Theme'),
-        children: [
-          SimpleDialogOption(
-            onPressed: () {
-              dataService.setThemeMode(ThemeMode.system);
-              Navigator.pop(context);
-            },
-            child: const Text('System Default'),
-          ),
-          SimpleDialogOption(
-            onPressed: () {
-              dataService.setThemeMode(ThemeMode.light);
-              Navigator.pop(context);
-            },
-            child: const Text('Light'),
-          ),
-          SimpleDialogOption(
-            onPressed: () {
-              dataService.setThemeMode(ThemeMode.dark);
-              Navigator.pop(context);
-            },
-            child: const Text('Dark'),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildThemeOption(
+              context,
+              icon: MediaQuery.of(context).platformBrightness == Brightness.light
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+              title: 'System Default',
+              onTap: () {
+                dataService.setThemeMode(ThemeMode.system);
+                Navigator.pop(context);
+              },
+              isSelected: dataService.themeMode == ThemeMode.system,
+            ),
+            const Divider(height: 1),
+            _buildThemeOption(
+              context,
+              icon: Icons.light_mode,
+              title: 'Light',
+              onTap: () {
+                dataService.setThemeMode(ThemeMode.light);
+                Navigator.pop(context);
+              },
+              isSelected: dataService.themeMode == ThemeMode.light,
+            ),
+            const Divider(height: 1),
+            _buildThemeOption(
+              context,
+              icon: Icons.dark_mode,
+              title: 'Dark',
+              onTap: () {
+                dataService.setThemeMode(ThemeMode.dark);
+                Navigator.pop(context);
+              },
+              isSelected: dataService.themeMode == ThemeMode.dark,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildThemeOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    required bool isSelected,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+        child: Row(
+          children: [
+            Icon(icon, color: isSelected ? Theme.of(context).colorScheme.primary : null),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Theme.of(context).colorScheme.primary : null,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected) Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
+          ],
+        ),
       ),
     );
   }

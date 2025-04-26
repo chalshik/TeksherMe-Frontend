@@ -17,138 +17,155 @@ class PackCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dataService = Provider.of<FirebaseDataService>(context);
+    final isLightMode = Theme.of(context).brightness == Brightness.light;
     
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title with bookmark
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          pack.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        // Description directly under title
-                        Text(
-                          pack.description,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                      color: pack.isBookmarked ? Theme.of(context).primaryColor : null,
-                    ),
-                    onPressed: () {
-                      if (pack.isBookmarked && onBookmarkTap != null) {
-                        // Use the provided callback for unbookmarking with confirmation
-                        onBookmarkTap!();
-                      } else {
-                        // Just bookmark directly without confirmation
-                        dataService.togglePackBookmark(pack.id);
-                      }
-                    },
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Difficulty chip and progress indicator
-              Row(
-                children: [
-                  Chip(
-                    label: Text(pack.difficulty),
-                    backgroundColor: _getDifficultyColor(context, pack.difficulty),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  
-                  const Spacer(),
-                  
-                  // Stats: time and questions
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.timer, size: 16),
-                      const SizedBox(width: 4),
-                      Text(_formatTime(pack.timeEstimate)),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.question_answer, size: 16),
-                      const SizedBox(width: 4),
-                      Text('${pack.questions.length} Q'),
-                    ],
-                  ),
-                ],
-              ),
-              
-              // Progress indicator if in progress
-              if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: pack.progressPercentage,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Progress: ${(pack.progressPercentage * 100).toInt()}%',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-              
-              // Completed tag
-              if (pack.isCompleted) ...[
-                const SizedBox(height: 12),
+      color: isLightMode ? Colors.white : null,
+      shadowColor: isLightMode ? Colors.blue.withOpacity(0.2) : null,
+      child: Container(
+        decoration: isLightMode ? BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white,
+              Colors.blue.shade50,
+            ],
+            stops: const [0.7, 1.0],
+          ),
+        ) : null,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title with bookmark
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.check_circle,
-                      color: Theme.of(context).brightness == Brightness.dark 
-                          ? Colors.green[300] 
-                          : Colors.green,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'COMPLETED',
-                      style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.green[300] 
-                            : Colors.green,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            pack.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Description directly under title
+                          Text(
+                            pack.description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).textTheme.bodySmall?.color,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                        color: pack.isBookmarked ? Theme.of(context).primaryColor : null,
+                      ),
+                      onPressed: () {
+                        if (pack.isBookmarked && onBookmarkTap != null) {
+                          // Use the provided callback for unbookmarking with confirmation
+                          onBookmarkTap!();
+                        } else {
+                          // Just bookmark directly without confirmation
+                          dataService.togglePackBookmark(pack.id);
+                        }
+                      },
                     ),
                   ],
                 ),
+                
+                const SizedBox(height: 12),
+                
+                // Difficulty chip and progress indicator
+                Row(
+                  children: [
+                    Chip(
+                      label: Text(pack.difficulty),
+                      backgroundColor: _getDifficultyColor(context, pack.difficulty),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    
+                    const Spacer(),
+                    
+                    // Stats: time and questions
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.timer, size: 16),
+                        const SizedBox(width: 4),
+                        Text(_formatTime(pack.timeEstimate)),
+                        const SizedBox(width: 12),
+                        const Icon(Icons.question_answer, size: 16),
+                        const SizedBox(width: 4),
+                        Text('${pack.questions.length} Q'),
+                      ],
+                    ),
+                  ],
+                ),
+                
+                // Progress indicator if in progress
+                if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
+                  const SizedBox(height: 12),
+                  LinearProgressIndicator(
+                    value: pack.progressPercentage,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Progress: ${(pack.progressPercentage * 100).toInt()}%',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+                
+                // Completed tag
+                if (pack.isCompleted) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Theme.of(context).brightness == Brightness.dark 
+                            ? Colors.green[300] 
+                            : Colors.green,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'COMPLETED',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark 
+                              ? Colors.green[300] 
+                              : Colors.green,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -172,13 +189,13 @@ class PackCard extends StatelessWidget {
     } else {
       switch (difficulty.toLowerCase()) {
         case 'easy':
-          return Colors.green[100]!;
+          return Color(0xFFE0F2F1); // Light teal/green
         case 'medium':
-          return Colors.orange[100]!;
+          return Color(0xFFFFF3E0); // Light orange
         case 'hard':
-          return Colors.red[100]!;
+          return Color(0xFFFFEBEE); // Light red
         default:
-          return Colors.grey[100]!;
+          return Color(0xFFF5F5F5); // Light grey
       }
     }
   }

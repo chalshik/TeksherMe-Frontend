@@ -69,26 +69,12 @@ class HomeScreen extends StatelessWidget {
   }
   
   void _showContinueOptions(BuildContext context, QuestionPack pack) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(pack.name),
-        content: const Text('Would you like to continue where you left off or restart?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => TestPreviewScreen(
-                    packId: pack.id,
-                  ),
-                ),
-              );
-            },
-            child: const Text('Preview'),
-          ),
-        ],
+    // Navigate directly to test preview without showing a dialog
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TestPreviewScreen(
+          packId: pack.id,
+        ),
       ),
     );
   }

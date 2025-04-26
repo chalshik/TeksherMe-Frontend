@@ -210,6 +210,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const CircularProgressIndicator()
                           : const Text('Sign In'),
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Don\'t have an account?'),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                            );
+                          },
+                          child: const Text('Register Now'),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -237,24 +253,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return const Icon(Icons.g_mobiledata);
                   },
                 ),
-                label: const Text('Sign in with Google'),
+                label: const Text('Continue with Google'),
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Don\'t have an account?'),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                      );
-                    },
-                    child: const Text('Register Now'),
-                  ),
-                ],
-              ),
             ],
           ),
         ),

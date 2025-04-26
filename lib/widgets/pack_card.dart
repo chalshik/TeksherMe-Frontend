@@ -44,43 +44,31 @@ class PackCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title with bookmark
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            pack.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          // Description directly under title
-                          Text(
-                            pack.description,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).textTheme.bodySmall?.color,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      child: Text(
+                        pack.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     IconButton(
                       icon: Icon(
                         pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                        color: pack.isBookmarked ? Theme.of(context).primaryColor : null,
+                        color: pack.isBookmarked 
+                            ? (Theme.of(context).brightness == Brightness.dark 
+                                ? Colors.white 
+                                : Theme.of(context).primaryColor)
+                            : null,
                       ),
                       onPressed: () {
                         if (pack.isBookmarked && onBookmarkTap != null) {
@@ -91,11 +79,13 @@ class PackCard extends StatelessWidget {
                           dataService.togglePackBookmark(pack.id);
                         }
                       },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
                 
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 
                 // Difficulty chip and progress indicator
                 Row(
@@ -178,24 +168,28 @@ class PackCard extends StatelessWidget {
     if (brightness == Brightness.dark) {
       switch (difficulty.toLowerCase()) {
         case 'easy':
-          return Colors.green.withOpacity(0.3);
+          return const Color(0xFF43A047); // Brighter green
         case 'medium':
-          return Colors.orange.withOpacity(0.3);
+          return const Color(0xFFFB8C00); // Brighter orange
         case 'hard':
-          return Colors.red.withOpacity(0.3);
+          return const Color(0xFFE53935); // Brighter red
+        case 'expert':
+          return const Color(0xFF8E24AA); // Brighter purple
         default:
-          return Colors.grey.withOpacity(0.3);
+          return const Color(0xFF757575); // Mid-tone grey
       }
     } else {
       switch (difficulty.toLowerCase()) {
         case 'easy':
-          return Color(0xFFE0F2F1); // Light teal/green
+          return const Color(0xFF66BB6A).withOpacity(0.2); // Material green with opacity
         case 'medium':
-          return Color(0xFFFFF3E0); // Light orange
+          return const Color(0xFFFFA726).withOpacity(0.2); // Material orange with opacity
         case 'hard':
-          return Color(0xFFFFEBEE); // Light red
+          return const Color(0xFFEF5350).withOpacity(0.2); // Material red with opacity
+        case 'expert':
+          return const Color(0xFFAB47BC).withOpacity(0.2); // Material purple with opacity
         default:
-          return Color(0xFFF5F5F5); // Light grey
+          return const Color(0xFF9E9E9E).withOpacity(0.2); // Material grey with opacity
       }
     }
   }

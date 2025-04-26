@@ -3,32 +3,114 @@ import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
 import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
+import '../widgets/commercial_card.dart';
+import '../screens/home_page.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load commercials when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<FirebaseDataService>(context, listen: false).loadCommercials();
+    });
+  }
+  
+  // Track the current page
+  int _currentAnnouncementPage = 0;
 
   @override
   Widget build(BuildContext context) {
     final dataService = Provider.of<FirebaseDataService>(context);
     final inProgressPacks = dataService.inProgressPacks;
+    final commercials = dataService.commercials;
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TeksherMe'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Add padding to account for status bar
+            SizedBox(height: MediaQuery.of(context).padding.top),
+            // Add extra spacing to push announcements down
+            const SizedBox(height: 50),
+            
+            // Commercials Section at the top
+            if (commercials.isNotEmpty) ...[
+              // Height for the carousel
+              SizedBox(
+                height: 150, // Fixed height for announcements section
+                child: PageView.builder(
+                  controller: PageController(
+                    viewportFraction: 0.85, // Show 85% of current item and 15% of next/previous
+                    initialPage: 0,
+                  ),
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentAnnouncementPage = index;
+                    });
+                  },
+                  itemCount: commercials.length,
+                  itemBuilder: (context, index) {
+                    // Scale and opacity effect
+                    final isCurrentPage = index == _currentAnnouncementPage;
+                    
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutQuint,
+                      margin: EdgeInsets.symmetric(
+                        vertical: isCurrentPage ? 0 : 10.0,
+                        horizontal: 8.0,
+                      ),
+                      child: Opacity(
+                        opacity: isCurrentPage ? 1.0 : 0.8,
+                        child: CommercialCard(commercial: commercials[index]),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Add page indicators
+              const SizedBox(height: 8),
+              commercials.length > 1 
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      commercials.length,
+                      (index) => Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: index == _currentAnnouncementPage
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+              const SizedBox(height: 24),
+            ],
+            
+            // Continue Section
             const Text(
               'Continue Where You Left Off',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
             Expanded(
               child: inProgressPacks.isEmpty
                   ? Center(
@@ -40,11 +122,11 @@ class HomeScreen extends StatelessWidget {
                           ElevatedButton(
                             onPressed: () {
                               // Navigate to Explore screen
-                              // Find the parent HomePage to change index
-                              final tabController = DefaultTabController.maybeOf(context);
-                              if (tabController != null) {
-                                tabController.animateTo(1); // Explore is at index 1
-                              }
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => const HomePage(initialIndex: 1),
+                                ),
+                              );
                             },
                             child: const Text('Explore Packs'),
                           ),

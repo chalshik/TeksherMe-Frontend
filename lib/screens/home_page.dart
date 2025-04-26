@@ -43,22 +43,24 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
-            label: 'Explore',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
-            label: 'Bookmarks',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            label: 'Settings',
+            label: '',
           ),
         ],
       ),

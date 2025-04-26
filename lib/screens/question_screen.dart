@@ -409,138 +409,82 @@ class _QuestionScreenState extends State<QuestionScreen> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Loading...')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: SafeArea(
+          child: Center(child: CircularProgressIndicator()),
+        ),
       );
     }
     
     if (currentIndex >= pack.questions.length) {
       return Scaffold(
-        appBar: AppBar(title: Text(pack.name)),
-        body: const Center(child: Text('All questions completed!')),
+        body: SafeArea(
+          child: Center(child: Text('All questions completed!')),
+        ),
       );
     }
     
     final question = pack.questions[currentIndex];
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(pack.name),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => _showQuitConfirmation(),
-        ),
-        actions: [
-          // Add dropdown menu for direct navigation
-          PopupMenuButton<int>(
-            tooltip: 'Jump to question',
-            icon: const Icon(Icons.more_vert),
-            itemBuilder: (context) => [
-              // Add jump to question heading
-              const PopupMenuItem(
-                enabled: false,
-                child: Text(
-                  'Jump to Question',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              // Add a divider
-              const PopupMenuDivider(),
-              // Add items for each question
-              for (int i = 0; i < pack.questions.length; i++)
-                PopupMenuItem(
-                  value: i,
-                  child: Row(
-                    children: [
-                      // Show check mark for answered questions
-                      if (pack.questions[i].isAnswered)
-                        Icon(
-                          Icons.check_circle,
-                          size: 16,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.green[300]
-                              : Colors.green,
-                        ),
-                      // Show current question indicator
-                      if (i == currentIndex && !pack.questions[i].isAnswered)
-                        Icon(
-                          Icons.radio_button_checked,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      // Show empty circle for unanswered, non-current questions
-                      if (i != currentIndex && !pack.questions[i].isAnswered)
-                        Icon(
-                          Icons.radio_button_unchecked,
-                          size: 16,
-                          color: Colors.grey,
-                        ),
-                      const SizedBox(width: 8),
-                      Text('Question ${i + 1}'),
-                    ],
-                  ),
-                ),
-            ],
-            onSelected: (index) => _navigateToQuestion(index),
-          ),
-          IconButton(
-            icon: Icon(
-              question.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-            ),
-            onPressed: _toggleBookmark,
-          ),
-          if (_isTimeLimited) ...[
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _secondsRemaining < 60 
-                      ? Theme.of(context).brightness == Brightness.dark 
-                          ? Colors.red.withOpacity(0.3) 
-                          : Color(0xFFFFEBEE) // Light red background
-                      : Theme.of(context).brightness == Brightness.dark 
-                          ? Theme.of(context).colorScheme.surface
-                          : Color(0xFFE3F2FD), // Light blue background
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: _secondsRemaining < 60 
-                        ? Colors.red.withOpacity(0.3) 
-                        : Colors.blue.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.timer, 
-                      size: 16,
-                      color: _secondsRemaining < 60 ? Colors.red : null,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _formatTimeRemaining(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: _secondsRemaining < 60 ? Colors.red : null,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Progress indicator
+            SizedBox(height: MediaQuery.of(context).padding.top),
+            
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => _showQuitConfirmation(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                
+                Expanded(
+                child: Text(
+                    pack.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                
+                _isTimeLimited 
+                    ? _buildTimer()
+                    : PopupMenuButton<int>(
+                        tooltip: 'Jump to question',
+                        icon: const Icon(Icons.more_vert),
+                        itemBuilder: _buildJumpToQuestionMenu,
+            onSelected: (index) => _navigateToQuestion(index),
+          ),
+              ],
+            ),
+            
+            if (_isTimeLimited) 
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PopupMenuButton<int>(
+                      tooltip: 'Jump to question',
+                      icon: const Icon(Icons.more_vert),
+                      itemBuilder: _buildJumpToQuestionMenu,
+                      onSelected: (index) => _navigateToQuestion(index),
+                    ),
+                  ],
+                ),
+              ),
+              
+            const SizedBox(height: 8),
+            
             LinearProgressIndicator(
               value: (currentIndex + 1) / pack.questions.length,
               backgroundColor: Theme.of(context).brightness == Brightness.dark 
@@ -564,16 +508,28 @@ class _QuestionScreenState extends State<QuestionScreen> {
             const SizedBox(height: 16),
             
             // Question text
-            Text(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
               question.text,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    question.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                    color: question.isBookmarked ? Colors.amber : null,
+                  ),
+                  onPressed: _toggleBookmark,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
               ),
+              ],
             ),
             const SizedBox(height: 16),
             
-            // Answer options
             Expanded(
               child: ListView.builder(
                 itemCount: question.options.length,
@@ -581,12 +537,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   final option = question.options[index];
                   final bool isSelected = question.selectedOptionIndex == index;
                   
-                  // Update the coloring to only show selection, not correctness
                   Color? cardColor;
                   if (isSelected) {
                     cardColor = Theme.of(context).brightness == Brightness.dark 
                         ? Theme.of(context).colorScheme.primary.withOpacity(0.2) 
-                        : Color(0xFFE3F2FD); // Light blue background for selected option
+                        : Color(0xFFE3F2FD);
                   }
                   
                   return Card(
@@ -622,27 +577,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         child: Text(String.fromCharCode(65 + index)),
                       ),
                       title: Text(option.toString()),
-                      // Allow changing answer by removing the isAnswered check
                       onTap: () => _answerQuestion(index),
-                      // Remove the correctness indicators
-                      trailing: isSelected
-                          ? Icon(
-                              Icons.check_circle,
-                              color: Theme.of(context).colorScheme.primary,
-                            )
-                          : null,
+                      trailing: null,
                     ),
                   );
                 },
               ),
             ),
             
-            // Pagination controls (positioned after answers but not at bottom)
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Back button (disabled on first question)
                 ElevatedButton(
                   onPressed: currentIndex > 0 
                       ? () => _navigateToQuestion(currentIndex - 1) 
@@ -668,10 +614,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   ),
                 ),
                 
-                // Finish button (only on the last question)
                 if (currentIndex == pack.questions.length - 1)
                   ElevatedButton.icon(
-                    onPressed: () => _showFinishConfirmation(),
+                    onPressed: () => _submitTest(),
                     icon: const Icon(Icons.done_all),
                     label: const Text('Finish Quiz'),
                     style: ElevatedButton.styleFrom(
@@ -684,7 +629,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     ),
                   ),
                 
-                // Next button (disabled on last question)
                 ElevatedButton(
                   onPressed: currentIndex < pack.questions.length - 1
                       ? () => _navigateToQuestion(currentIndex + 1)
@@ -718,15 +662,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
   
-  // Add a method to navigate to a specific question
   Future<void> _navigateToQuestion(int index) async {
     if (index < 0 || index >= pack.questions.length) return;
     
-    // Update progress in Firestore
     final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     await dataService.updatePackProgress(pack.id, index);
     
-    // Update the UI
     if (mounted) {
       setState(() {
         currentIndex = index;
@@ -734,9 +675,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
   }
   
-  // Add method to show finish confirmation
   void _showFinishConfirmation() {
-    // Count unanswered questions
     final unansweredCount = pack.questions.where((q) => !q.isAnswered).length;
     
     showDialog(
@@ -765,7 +704,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
   
-  // Add a method to show quit confirmation
   void _showQuitConfirmation() {
     showDialog(
       context: context,
@@ -781,7 +719,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context);
               _quitQuiz();
             },
             child: const Text('Quit'),
@@ -791,32 +729,119 @@ class _QuestionScreenState extends State<QuestionScreen> {
     );
   }
   
-  // Method to handle quitting the quiz
   void _quitQuiz() async {
-    // Save current progress before quitting
     final dataService = Provider.of<FirebaseDataService>(context, listen: false);
     
-    // Even if on first question, mark as "in progress"
-    // Also save the remaining time
     await dataService.updatePackProgress(
       pack.id, 
       currentIndex,
       remainingSeconds: _secondsRemaining,
     );
     
-    // Navigate to the HomePage with Explore tab
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => const HomePage(initialIndex: 1),
         ),
-        (route) => false, // Remove all previous screens
+        (route) => false,
       );
     }
   }
+  
+  // Add method for building the timer widget
+  Widget _buildTimer() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: _secondsRemaining < 60 
+            ? Theme.of(context).brightness == Brightness.dark 
+                ? Colors.red.withOpacity(0.3) 
+                : const Color(0xFFFFEBEE) // Light red background
+            : Theme.of(context).brightness == Brightness.dark 
+                ? Theme.of(context).colorScheme.surface
+                : const Color(0xFFE3F2FD), // Light blue background
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: _secondsRemaining < 60 
+              ? Colors.red.withOpacity(0.3) 
+              : Colors.blue.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.timer, 
+            size: 16,
+            color: _secondsRemaining < 60 ? Colors.red : null,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            _formatTimeRemaining(),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: _secondsRemaining < 60 ? Colors.red : null,
+            ),
+          ),
+        ],
+      ),
+    );
 }
 
-// This class is just a bridge to create a fresh QuestionScreen
+  // Add method for building the jump to question menu
+  List<PopupMenuEntry<int>> _buildJumpToQuestionMenu(BuildContext context) {
+    return [
+      // Add jump to question heading
+      const PopupMenuItem(
+        enabled: false,
+        child: Text(
+          'Jump to Question',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ),
+      // Add a divider
+      const PopupMenuDivider(),
+      // Add items for each question
+      for (int i = 0; i < pack.questions.length; i++)
+        PopupMenuItem(
+          value: i,
+          child: Row(
+            children: [
+              // Show check mark for answered questions
+              if (pack.questions[i].isAnswered)
+                Icon(
+                  Icons.check_circle,
+                  size: 16,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.green[300]
+                      : Colors.green,
+                ),
+              // Show current question indicator
+              if (i == currentIndex && !pack.questions[i].isAnswered)
+                Icon(
+                  Icons.radio_button_checked,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              // Show empty circle for unanswered, non-current questions
+              if (i != currentIndex && !pack.questions[i].isAnswered)
+                Icon(
+                  Icons.radio_button_unchecked,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+              const SizedBox(width: 8),
+              Text('Question ${i + 1}'),
+            ],
+          ),
+        ),
+    ];
+  }
+}
+
 class RestartQuestionScreen extends StatelessWidget {
   final String packId;
   
@@ -827,7 +852,6 @@ class RestartQuestionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use a builder to ensure we get a fresh build context
     return QuestionScreen(
       packId: packId,
       startFromBeginning: true,

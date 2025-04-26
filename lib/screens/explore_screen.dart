@@ -4,6 +4,7 @@ import '../data/firebase_data_service.dart';
 import 'category_packs_screen.dart';
 import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
+import 'package:flutter/rendering.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -28,14 +29,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
         .toList();
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Explore'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Add padding to account for status bar
+            SizedBox(height: MediaQuery.of(context).padding.top),
             // Search bar
             TextField(
               decoration: InputDecoration(
@@ -77,33 +77,31 @@ class _ExploreScreenState extends State<ExploreScreen> {
   
   // Categories list builder
   Widget _buildCategoriesList(List<String> categories, BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
       itemCount: categories.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12.0),
-          child: Container(
-            width: double.infinity,
-            height: 80, // Increased height for more rectangular shape
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                alignment: Alignment.centerLeft,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () {
-                _showPacksByCategory(context, categories[index]);
-              },
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
+        return InkWell(
+          onTap: () {
+            _showPacksByCategory(context, categories[index]);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
                   categories[index],
-                  style: const TextStyle(fontSize: 22),
-                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey,
+                ),
+              ],
             ),
           ),
         );

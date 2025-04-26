@@ -15,14 +15,14 @@ class SettingsScreen extends StatelessWidget {
     final user = authService.currentUser;
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Add padding to account for status bar
+            SizedBox(height: MediaQuery.of(context).padding.top),
+            
             // User profile section
             if (user != null) _buildProfileSection(context, user),
             

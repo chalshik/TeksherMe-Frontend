@@ -42,193 +42,215 @@ class TestPreviewScreen extends StatelessWidget {
     }
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(pack.name),
-        actions: [
-          IconButton(
-            icon: Icon(
-              pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-              color: pack.isBookmarked ? Theme.of(context).primaryColor : null,
-            ),
-            onPressed: () {
-              if (pack.isBookmarked) {
-                _showUnbookmarkConfirmation(
-                  context,
-                  'Remove Bookmark',
-                  'Are you sure you want to remove this pack from your bookmarks?',
-                  () => dataService.togglePackBookmark(pack.id)
-                );
-              } else {
-                dataService.togglePackBookmark(pack.id);
-              }
-            },
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with title and description
-            Container(
-              padding: const EdgeInsets.all(16),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.grey[850] 
-                    : Colors.blue[50],
-                borderRadius: BorderRadius.circular(12),
-                gradient: Theme.of(context).brightness == Brightness.dark 
-                    ? null
-                    : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.blue[50]!,
-                          Colors.blue[100]!.withOpacity(0.5),
-                        ],
-                      ),
-                boxShadow: Theme.of(context).brightness == Brightness.dark 
-                    ? null 
-                    : [
-                        BoxShadow(
-                          color: Colors.blue.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Add padding to account for status bar
+              SizedBox(height: MediaQuery.of(context).padding.top),
+              // Back button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Test title
-                  Text(
-                    pack.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.of(context).pop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  // Description
-                  Text(
-                    pack.description,
-                    style: const TextStyle(fontSize: 16),
+                  // Bookmark button
+                  IconButton(
+                    icon: Icon(
+                      pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                      color: pack.isBookmarked 
+                          ? (Theme.of(context).brightness == Brightness.dark 
+                              ? Colors.white 
+                              : Colors.amber)
+                          : null,
+                    ),
+                    onPressed: () {
+                      dataService.toggleTestSetBookmark(pack.id);
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Quick info row
-            Row(
-              children: [
-                Expanded(
-                  child: _InfoCard(
-                    icon: Icons.timer,
-                    title: 'Time',
-                    value: _formatTime(pack.timeEstimate),
-                  ),
+              const SizedBox(height: 16),
+              // Header with title and description
+              Container(
+                padding: const EdgeInsets.all(16),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.grey[850] 
+                      : Colors.blue[50],
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: Theme.of(context).brightness == Brightness.dark 
+                      ? null
+                      : LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.blue[50]!,
+                            Colors.blue[100]!.withOpacity(0.5),
+                          ],
+                        ),
+                  boxShadow: Theme.of(context).brightness == Brightness.dark 
+                      ? null 
+                      : [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _InfoCard(
-                    icon: Icons.question_answer,
-                    title: 'Questions',
-                    value: pack.questions.length.toString(),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Test title
+                    Text(
+                      pack.name,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Description
+                    Text(
+                      pack.description,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _InfoCard(
-                    icon: Icons.stacked_line_chart,
-                    title: 'Difficulty',
-                    value: pack.difficulty,
-                    valueColor: _getDifficultyTextColor(context, pack.difficulty),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Quick info row
+              Row(
+                children: [
+                  Expanded(
+                    child: _InfoCard(
+                      icon: Icons.timer,
+                      title: 'Time',
+                      value: _formatTime(pack.timeEstimate),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _InfoCard(
+                      icon: Icons.question_answer,
+                      title: 'Questions',
+                      value: pack.questions.length.toString(),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _InfoCard(
+                      icon: Icons.stacked_line_chart,
+                      title: 'Difficulty',
+                      value: pack.difficulty,
+                      valueColor: _getDifficultyTextColor(context, pack.difficulty),
+                    ),
+                  ),
+                ],
+              ),
+              
+              // Status card (only show if in progress or completed)
+              if (pack.isStarted || pack.isCompleted) ...[
+                const SizedBox(height: 24),
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? null 
+                      : Colors.white,
+                  shadowColor: Theme.of(context).brightness == Brightness.dark 
+                      ? null 
+                      : Colors.blue.withOpacity(0.2),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              _getStatusIcon(status),
+                              size: 18,
+                              color: statusColor,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              status,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: statusColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
+                          const SizedBox(height: 12),
+                          LinearProgressIndicator(
+                            value: pack.progressPercentage,
+                            borderRadius: BorderRadius.circular(4),
+                            minHeight: 8,
+                            backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                                ? null 
+                                : Colors.blue.withOpacity(0.1),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).brightness == Brightness.dark 
+                                  ? Theme.of(context).colorScheme.primary 
+                                  : Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Progress: ${(pack.progressPercentage * 100).toInt()}% (${pack.lastQuestionIndex}/${pack.questions.length} questions)',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ],
-            ),
-            
-            // Status card (only show if in progress or completed)
-            if (pack.isStarted || pack.isCompleted) ...[
-              const SizedBox(height: 24),
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? null 
-                    : Colors.white,
-                shadowColor: Theme.of(context).brightness == Brightness.dark 
-                    ? null 
-                    : Colors.blue.withOpacity(0.2),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            _getStatusIcon(status),
-                            size: 18,
-                            color: statusColor,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            status,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: statusColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                      if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
-                        const SizedBox(height: 12),
-                        LinearProgressIndicator(
-                          value: pack.progressPercentage,
-                          borderRadius: BorderRadius.circular(4),
-                          minHeight: 8,
-                          backgroundColor: Theme.of(context).brightness == Brightness.dark 
-                              ? null 
-                              : Colors.blue.withOpacity(0.1),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Theme.of(context).brightness == Brightness.dark 
-                                ? Theme.of(context).colorScheme.primary 
-                                : Colors.blue,
+              
+              // Action button
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    if (pack.isCompleted) {
+                      // Restart completed test - navigate immediately after reset
+                      dataService.resetTestProgress(pack.id);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => QuestionScreen(
+                            packId: pack.id,
+                            startFromBeginning: true,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Progress: ${(pack.progressPercentage * 100).toInt()}% (${pack.lastQuestionIndex}/${pack.questions.length} questions)',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            
-            // Action button
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  if (pack.isCompleted) {
-                    // Restart completed test 
-                    dataService.resetTestProgress(pack.id).then((_) {
+                      );
+                    } else if (pack.lastQuestionIndex > 0) {
+                      // For in-progress tests, show a continue/restart dialog
+                      _showContinueRestartDialog(context, dataService, pack);
+                    } else {
+                      // Start new test
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => QuestionScreen(
@@ -237,49 +259,36 @@ class TestPreviewScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                    });
-                  } else if (pack.lastQuestionIndex > 0) {
-                    // For in-progress tests, show a continue/restart dialog
-                    _showContinueRestartDialog(context, dataService, pack);
-                  } else {
-                    // Start new test
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => QuestionScreen(
-                          packId: pack.id,
-                          startFromBeginning: true,
-                        ),
-                      ),
-                    );
-                  }
-                },
-                icon: Icon(
-                  pack.isCompleted
-                      ? Icons.refresh
-                      : Icons.play_arrow
-                ),
-                label: Text(
-                  pack.isCompleted
-                      ? 'Restart Test'
-                      : 'Start Test',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    }
+                  },
+                  icon: Icon(
+                    pack.isCompleted
+                        ? Icons.refresh
+                        : Icons.play_arrow
                   ),
-                  backgroundColor: Theme.of(context).brightness == Brightness.dark 
-                      ? null 
-                      : Colors.blue,
-                  foregroundColor: Colors.white,
-                  elevation: 3,
-                  shadowColor: Theme.of(context).brightness == Brightness.dark 
-                      ? null 
-                      : Colors.blue.withOpacity(0.4),
+                  label: Text(
+                    pack.isCompleted
+                        ? 'Restart Test'
+                        : 'Start Test',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                        ? null 
+                        : Colors.blue,
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shadowColor: Theme.of(context).brightness == Brightness.dark 
+                        ? null 
+                        : Colors.blue.withOpacity(0.4),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -396,16 +405,16 @@ class TestPreviewScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              dataService.resetTestProgress(pack.id).then((_) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => QuestionScreen(
-                      packId: pack.id,
-                      startFromBeginning: true,
-                    ),
+              // Reset progress and immediately navigate
+              dataService.resetTestProgress(pack.id);
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => QuestionScreen(
+                    packId: pack.id,
+                    startFromBeginning: true,
                   ),
-                );
-              });
+                ),
+              );
             },
             child: const Text('Restart'),
           ),

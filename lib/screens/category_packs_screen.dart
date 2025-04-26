@@ -15,36 +15,61 @@ class CategoryPacksScreen extends StatelessWidget {
     final packs = dataService.getPacksByCategory(category);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          category,
-          style: const TextStyle(fontSize: 22),
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: packs.isEmpty
-            ? const Center(
-                child: Text('No packs available in this category'),
-              )
-            : ListView.builder(
-                itemCount: packs.length,
-                itemBuilder: (context, index) {
-                  final pack = packs[index];
-                  return PackCard(
-                    pack: pack,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => TestPreviewScreen(
-                            packId: pack.id,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: MediaQuery.of(context).padding.top),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    category,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: packs.isEmpty
+                  ? const Center(
+                      child: Text('No packs available in this category'),
+                    )
+                  : ListView.builder(
+                      itemCount: packs.length,
+                      itemBuilder: (context, index) {
+                        final pack = packs[index];
+                        return PackCard(
+                          pack: pack,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => TestPreviewScreen(
+                                  packId: pack.id,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

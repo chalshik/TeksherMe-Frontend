@@ -118,6 +118,20 @@ class Category {
   });
 }
 
+class Commercial {
+  final String id;
+  final String title;
+  final String description;
+  final DateTime date;
+
+  Commercial({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.date,
+  });
+}
+
 class FirebaseDataService extends ChangeNotifier {
   // Singleton pattern
   static final FirebaseDataService _instance = FirebaseDataService._internal();
@@ -138,6 +152,7 @@ class FirebaseDataService extends ChangeNotifier {
   // Data collections
   final List<TestSet> _testSets = [];
   final List<Category> _categories = [];
+  final List<Commercial> _commercials = [];
   
   // Getters
   List<TestSet> get allTestSets => _testSets;
@@ -158,6 +173,8 @@ class FirebaseDataService extends ChangeNotifier {
   String? get currentUserId => _auth.currentUser?.uid;
   bool get isLoggedIn => _auth.currentUser != null;
   
+  List<Commercial> get commercials => _commercials;
+  
   // Initialize with data from Firebase
   Future<void> initialize() async {
     // Don't try to sign in anonymously - this fails if not enabled in Firebase console
@@ -165,6 +182,7 @@ class FirebaseDataService extends ChangeNotifier {
     await _loadThemePreference();
     await _loadCategories();
     await _loadTestSets();
+    await loadCommercials();
     
     // Only load user-specific data if actually signed in
     if (_auth.currentUser != null) {
@@ -1036,4 +1054,30 @@ class FirebaseDataService extends ChangeNotifier {
   
   // Alias signOut to maintain logout compatibility
   Future<void> logout() => signOut();
+
+  // Add commercials functionality
+  Future<void> loadCommercials() async {
+    try {
+      _commercials.clear();
+      
+      final commercialSnapshot = await _firestore.collection('commercials')
+          .orderBy('date', descending: true)
+          .limit(5) // Limit to 5 most recent commercials
+          .get();
+      
+      for (final doc in commercialSnapshot.docs) {
+        final data = doc.data();
+        _commercials.add(Commercial(
+          id: doc.id,
+          title: data['title'] ?? '',
+          description: data['description'] ?? '',
+          date: data['date']?.toDate() ?? DateTime.now(),
+        ));
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error loading commercials: $e');
+    }
+  }
 } 

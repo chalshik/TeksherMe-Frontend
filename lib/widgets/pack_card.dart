@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
+import '../data/theme.dart';
 
 class PackCard extends StatelessWidget {
   final QuestionPack pack;
@@ -17,197 +18,207 @@ class PackCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dataService = Provider.of<FirebaseDataService>(context);
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isLightMode = Theme.of(context).brightness == Brightness.light;
     
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.surface,
-                isDarkMode
-                    ? Theme.of(context).colorScheme.surface
-                    : Theme.of(context).colorScheme.primary.withOpacity(0.05),
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header section with title and bookmark
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 8, 8),
-                child: Row(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: TeksherTheme.getShadow(isLightMode ? false : true),
+      ),
+      child: Card(
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: isLightMode 
+                  ? BoxDecoration(
+                      color: Colors.white,
+                    )
+                  : null,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Left side badge with difficulty
-                    Container(
-                      decoration: BoxDecoration(
-                        color: _getDifficultyColor(context, pack.difficulty).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      child: Text(
-                        pack.difficulty,
-                        style: TextStyle(
-                          color: _getDifficultyColor(context, pack.difficulty),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(width: 12),
-                    
-                    // Title in the middle
-                    Expanded(
-                      child: Text(
-                        pack.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    
-                    // Bookmark icon on the right
-                    IconButton(
-                      icon: Icon(
-                        pack.isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
-                        color: pack.isBookmarked 
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                      onPressed: () {
-                        if (pack.isBookmarked && onBookmarkTap != null) {
-                          // Use the provided callback for unbookmarking with confirmation
-                          onBookmarkTap!();
-                        } else {
-                          // Just bookmark directly without confirmation
-                          dataService.togglePackBookmark(pack.id);
-                        }
-                      },
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
-                ),
-              ),
-              
-              const Divider(height: 1),
-              
-              // Content section
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // Question count icon
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Icons.quiz_outlined,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // Title row with bookmark
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          '${pack.questions.length} Questions',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Text(
+                            pack.name,
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
                         ),
-                        Text(
-                          'Estimated time: ${_formatTime(pack.timeEstimate)}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          child: IconButton(
+                            icon: Icon(
+                              pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border_rounded,
+                              color: pack.isBookmarked 
+                                  ? Theme.of(context).colorScheme.primary
+                                  : isLightMode ? Colors.black45 : Colors.white60,
+                              size: 26,
+                            ),
+                            onPressed: () {
+                              if (pack.isBookmarked && onBookmarkTap != null) {
+                                // Use the provided callback for unbookmarking with confirmation
+                                onBookmarkTap!();
+                              } else {
+                                // Just bookmark directly without confirmation
+                                dataService.togglePackBookmark(pack.id);
+                              }
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              
-              // Progress section if in progress
-              if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.primary,
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Difficulty chip and stats
+                    Row(
+                      children: [
+                        // Difficulty chip with proper styling
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _getDifficultyColor(context, pack.difficulty).withOpacity(isLightMode ? 0.15 : 0.3),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Progress: ${(pack.progressPercentage * 100).toInt()}%',
+                          child: Text(
+                            pack.difficulty,
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _getDifficultyColor(context, pack.difficulty),
+                            ),
+                          ),
+                        ),
+                        
+                        const Spacer(),
+                        
+                        // Stats with nicer styling
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              size: 18,
+                              color: isLightMode ? Colors.black54 : Colors.white70,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _formatTime(pack.timeEstimate),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: isLightMode ? Colors.black54 : Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Icon(
+                              Icons.quiz_outlined,
+                              size: 18,
+                              color: isLightMode ? Colors.black54 : Colors.white70,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${pack.questions.length} Q',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: isLightMode ? Colors.black54 : Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    
+                    // Progress indicator if in progress
+                    if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
+                      const SizedBox(height: 16),
+                      Stack(
+                        children: [
+                          // Background track
+                          Container(
+                            height: 8,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: isLightMode 
+                                ? Colors.grey.withOpacity(0.15) 
+                                : Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          // Progress fill
+                          Container(
+                            height: 8,
+                            width: MediaQuery.of(context).size.width * pack.progressPercentage * 0.8, // Adjust for card padding
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).colorScheme.primary,
+                                  Theme.of(context).colorScheme.secondary,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(4),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: pack.progressPercentage,
-                          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Theme.of(context).colorScheme.primary,
-                          ),
-                          minHeight: 6,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              
-              // Completed tag
-              if (pack.isCompleted)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green.shade600,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
                       Text(
-                        'COMPLETED',
-                        style: TextStyle(
-                          color: Colors.green.shade600,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                        'Progress: ${(pack.progressPercentage * 100).toInt()}%',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
-                  ),
+                    
+                    // Completed tag with nicer styling
+                    if (pack.isCompleted) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: TeksherTheme.successLight.withOpacity(isLightMode ? 0.1 : 0.2),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: isLightMode ? TeksherTheme.successLight : TeksherTheme.successDark,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'COMPLETED',
+                              style: TextStyle(
+                                color: isLightMode ? TeksherTheme.successLight : TeksherTheme.successDark,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-            ],
+              ),
+            ),
           ),
         ),
       ),
@@ -215,46 +226,26 @@ class PackCard extends StatelessWidget {
   }
   
   Color _getDifficultyColor(BuildContext context, String difficulty) {
-    final brightness = Theme.of(context).brightness;
+    final isLightMode = Theme.of(context).brightness == Brightness.light;
+    final colors = isLightMode 
+      ? TeksherTheme.difficultyColorsLight 
+      : TeksherTheme.difficultyColorsDark;
     
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return const Color(0xFF4CAF50); // Green
-      case 'medium':
-        return const Color(0xFFFFA726); // Orange
-      case 'hard':
-        return const Color(0xFFF44336); // Red
-      case 'expert':
-        return const Color(0xFF9C27B0); // Purple
-      default:
-        return const Color(0xFF757575); // Grey
-    }
+    return colors[difficulty.toLowerCase()] ?? Colors.grey;
   }
 
   // Format time to show seconds if less than 1 minute
   String _formatTime(double time) {
     if (time < 1.0) {
       // For times less than 1 minute, convert to seconds
-      final seconds = (time * 60).round();
+      int seconds = (time * 60).round();
       return '$seconds sec';
-    } else if (time < 60) {
-      // For times less than 1 hour
-      final minutes = time.floor();
-      final seconds = ((time - minutes) * 60).round();
-      if (seconds > 0) {
-        return '$minutes min $seconds sec';
-      } else {
-        return '$minutes min';
-      }
+    } else if (time == time.roundToDouble()) {
+      // For whole minute values (1.0, 2.0, etc.)
+      return '${time.toInt()} min';
     } else {
-      // For times of 1 hour or more
-      final hours = time ~/ 60;
-      final minutes = (time % 60).round();
-      if (minutes > 0) {
-        return '$hours hr $minutes min';
-      } else {
-        return '$hours hr';
-      }
+      // For other decimal values (1.5, 2.3, etc.)
+      return '${time.toStringAsFixed(1)} min';
     }
   }
 } 

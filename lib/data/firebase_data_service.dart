@@ -122,12 +122,18 @@ class Commercial {
   final String id;
   final String title;
   final String description;
+  final String? imageUrl;
+  final String? url;
+  final String? ctaText;
   final DateTime date;
 
   Commercial({
     required this.id,
     required this.title,
     required this.description,
+    this.imageUrl,
+    this.url,
+    this.ctaText,
     required this.date,
   });
 }
@@ -174,6 +180,39 @@ class FirebaseDataService extends ChangeNotifier {
   bool get isLoggedIn => _auth.currentUser != null;
   
   List<Commercial> get commercials => _commercials;
+  
+  // Compatibility getters for the new model names
+  List<QuestionPack> get allPacks => allTestSets;
+  List<QuestionPack> get inProgressPacks => inProgressTestSets;
+  List<QuestionPack> get bookmarkedPacks => bookmarkedTestSets;
+  
+  // Add compatibility aliases to maintain backward compatibility with existing code
+   
+  // QuestionPack compatibility methods
+  Future<void> startPack(String packId) => startTestSet(packId);
+  Future<void> continuePack(String packId) => continueTestSet(packId);
+  Future<void> updatePackProgress(String packId, int questionIndex, {int? remainingSeconds}) => 
+      updateTestProgress(packId, questionIndex, remainingSeconds: remainingSeconds);
+  Future<void> togglePackBookmark(String packId) => toggleTestSetBookmark(packId);
+  TestSet? getPackById(String id) => getTestSetById(id);
+   
+  List<TestSet> getPacksByCategory(String category) {
+    // Find category ID by name
+    String? categoryId;
+    try {
+      categoryId = _categories.firstWhere((cat) => cat.name.toLowerCase() == category.toLowerCase()).id;
+    } catch (e) {
+      // If category not found by name, try using the id directly
+      categoryId = category;
+    }
+    return getTestSetsByCategory(categoryId);
+  }
+   
+  // Legacy getter aliases
+  List<TestSet> get allQuestionPacks => _testSets;
+   
+  // Alias signOut to maintain logout compatibility
+  Future<void> logout() => signOut();
   
   // Initialize with data from Firebase
   Future<void> initialize() async {
@@ -1023,38 +1062,6 @@ class FirebaseDataService extends ChangeNotifier {
     }
   }
 
-  // Add compatibility aliases to maintain backward compatibility with existing code
-  
-  // Type aliases - typedef doesn't work for classes, but we can create extension methods
-  
-  // QuestionPack compatibility methods
-  Future<void> startPack(String packId) => startTestSet(packId);
-  Future<void> continuePack(String packId) => continueTestSet(packId);
-  Future<void> updatePackProgress(String packId, int questionIndex, {int? remainingSeconds}) => 
-      updateTestProgress(packId, questionIndex, remainingSeconds: remainingSeconds);
-  Future<void> togglePackBookmark(String packId) => toggleTestSetBookmark(packId);
-  TestSet? getPackById(String id) => getTestSetById(id);
-  
-  List<TestSet> getPacksByCategory(String category) {
-    // Find category ID by name
-    String? categoryId;
-    try {
-      categoryId = _categories.firstWhere((cat) => cat.name.toLowerCase() == category.toLowerCase()).id;
-    } catch (e) {
-      // If category not found by name, try using the id directly
-      categoryId = category;
-    }
-    return getTestSetsByCategory(categoryId);
-  }
-  
-  // Legacy getter aliases
-  List<TestSet> get allQuestionPacks => _testSets;
-  List<TestSet> get inProgressPacks => inProgressTestSets;
-  List<TestSet> get bookmarkedPacks => bookmarkedTestSets;
-  
-  // Alias signOut to maintain logout compatibility
-  Future<void> logout() => signOut();
-
   // Add commercials functionality
   Future<void> loadCommercials() async {
     try {
@@ -1071,6 +1078,9 @@ class FirebaseDataService extends ChangeNotifier {
           id: doc.id,
           title: data['title'] ?? '',
           description: data['description'] ?? '',
+          imageUrl: data['imageUrl'] ?? '',
+          url: data['url'] ?? '',
+          ctaText: data['ctaText'] ?? 'Learn More',
           date: data['date']?.toDate() ?? DateTime.now(),
         ));
       }

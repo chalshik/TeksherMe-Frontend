@@ -30,27 +30,31 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final dataService = Provider.of<FirebaseDataService>(context);
     final inProgressPacks = dataService.inProgressPacks;
-    final commercials = dataService.commercials;
+    
+    // Get commercials with a fallback for empty results
+    final commercials = dataService.commercials.isNotEmpty 
+        ? dataService.commercials 
+        : _getDummyCommercials();
     
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Add padding to account for status bar
             SizedBox(height: MediaQuery.of(context).padding.top),
             // Add extra spacing to push announcements down
-            const SizedBox(height: 50),
+            const SizedBox(height: 40),
             
             // Commercials Section at the top
             if (commercials.isNotEmpty) ...[
               // Height for the carousel
               SizedBox(
-                height: 150, // Fixed height for announcements section
+                height: 158, // Increased height slightly to prevent overflow
                 child: PageView.builder(
                   controller: PageController(
-                    viewportFraction: 0.85, // Show 85% of current item and 15% of next/previous
+                    viewportFraction: 0.92, // Show more of current item (was 0.85)
                     initialPage: 0,
                   ),
                   onPageChanged: (index) {
@@ -68,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       curve: Curves.easeOutQuint,
                       margin: EdgeInsets.symmetric(
                         vertical: isCurrentPage ? 0 : 10.0,
-                        horizontal: 8.0,
+                        horizontal: 6.0, // Reduced from 8.0
                       ),
                       child: Opacity(
                         opacity: isCurrentPage ? 1.0 : 0.8,
@@ -159,5 +163,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+  
+  // Fallback method to generate dummy commercials if none are returned from the API
+  List<Commercial> _getDummyCommercials() {
+    return [
+      Commercial(
+        id: 'dummy1',
+        title: 'Premium Subscription',
+        description: 'Unlock all test packs and analytics',
+        imageUrl: null,
+        url: '',
+        ctaText: 'Learn More',
+        date: DateTime.now(),
+      ),
+      Commercial(
+        id: 'dummy2',
+        title: 'New Expert Packs',
+        description: 'Challenge yourself with advanced questions',
+        imageUrl: null,
+        url: '',
+        ctaText: 'Explore',
+        date: DateTime.now(),
+      ),
+    ];
   }
 } 

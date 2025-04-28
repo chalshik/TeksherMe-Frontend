@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
+import '../data/category_styles.dart';
 import 'category_packs_screen.dart';
 import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
@@ -22,11 +23,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final dataService = Provider.of<FirebaseDataService>(context);
     final allPacks = dataService.allQuestionPacks;
     
-    // Get unique categories
-    final categories = allPacks
-        .map((pack) => pack.category)
-        .toSet()
-        .toList();
+    // Get categories from service instead of from packs
+    final categories = dataService.getAllCategoryNames();
     
     return Scaffold(
       body: Padding(
@@ -81,20 +79,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
       itemCount: categories.length,
       separatorBuilder: (context, index) => const Divider(height: 1),
       itemBuilder: (context, index) {
+        final categoryName = categories[index];
         return InkWell(
           onTap: () {
-            _showPacksByCategory(context, categories[index]);
+            _showPacksByCategory(context, categoryName);
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  categories[index],
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                // Category icon
+                CategoryStyles.buildCategoryIcon(categoryName, size: 50),
+                const SizedBox(width: 16),
+                // Category name
+                Expanded(
+                  child: Text(
+                    categoryName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 const Icon(

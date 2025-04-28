@@ -36,8 +36,8 @@ class PackCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Material(
             color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
+        child: InkWell(
+          onTap: onTap,
               splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               highlightColor: Theme.of(context).colorScheme.primary.withOpacity(0.05),
               child: Container(
@@ -47,50 +47,50 @@ class PackCard extends StatelessWidget {
                       color: Colors.white,
                     )
                   : null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                     // Title row with bookmark
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            pack.name,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        pack.name,
                             style: Theme.of(context).textTheme.headlineSmall,
                           ),
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           child: IconButton(
-                            icon: Icon(
+                      icon: Icon(
                               pack.isBookmarked ? Icons.bookmark : Icons.bookmark_border_rounded,
-                              color: pack.isBookmarked 
+                        color: pack.isBookmarked 
                                   ? Theme.of(context).colorScheme.primary
                                   : isLightMode ? Colors.black45 : Colors.white60,
                               size: 26,
-                            ),
-                            onPressed: () {
-                              if (pack.isBookmarked && onBookmarkTap != null) {
-                                // Use the provided callback for unbookmarking with confirmation
-                                onBookmarkTap!();
-                              } else {
-                                // Just bookmark directly without confirmation
-                                dataService.togglePackBookmark(pack.id);
-                              }
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
+                      ),
+                      onPressed: () {
+                        if (pack.isBookmarked && onBookmarkTap != null) {
+                          // Use the provided callback for unbookmarking with confirmation
+                          onBookmarkTap!();
+                        } else {
+                          // Just bookmark directly without confirmation
+                          dataService.togglePackBookmark(pack.id);
+                        }
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                           ),
-                        ),
-                      ],
                     ),
-                    
+                  ],
+                ),
+                
                     const SizedBox(height: 16),
-                    
+                
                     // Difficulty chip and stats
-                    Row(
-                      children: [
+                Row(
+                  children: [
                         // Difficulty chip with proper styling
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -106,20 +106,20 @@ class PackCard extends StatelessWidget {
                               color: _getDifficultyColor(context, pack.difficulty),
                             ),
                           ),
-                        ),
-                        
-                        const Spacer(),
-                        
+                    ),
+                    
+                    const Spacer(),
+                    
                         // Stats with nicer styling
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                             Icon(
                               Icons.timer_outlined,
                               size: 18,
                               color: isLightMode ? Colors.black54 : Colors.white70,
                             ),
-                            const SizedBox(width: 4),
+                        const SizedBox(width: 4),
                             Text(
                               _formatTime(pack.timeEstimate),
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -132,20 +132,20 @@ class PackCard extends StatelessWidget {
                               size: 18,
                               color: isLightMode ? Colors.black54 : Colors.white70,
                             ),
-                            const SizedBox(width: 4),
+                        const SizedBox(width: 4),
                             Text(
                               '${pack.questions.length} Q',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 color: isLightMode ? Colors.black54 : Colors.white70,
                               ),
                             ),
-                          ],
-                        ),
                       ],
                     ),
-                    
-                    // Progress indicator if in progress
-                    if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
+                  ],
+                ),
+                
+                // Progress indicator if in progress
+                if (pack.lastQuestionIndex > 0 && !pack.isCompleted) ...[
                       const SizedBox(height: 16),
                       Stack(
                         children: [
@@ -177,16 +177,16 @@ class PackCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'Progress: ${(pack.progressPercentage * 100).toInt()}%',
+                  Text(
+                    'Progress: ${(pack.progressPercentage * 100).toInt()}%',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
-                      ),
-                    ],
-                    
+                  ),
+                ],
+                
                     // Completed tag with nicer styling
-                    if (pack.isCompleted) ...[
+                if (pack.isCompleted) ...[
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -196,26 +196,26 @@ class PackCard extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.check_circle,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
                               color: isLightMode ? TeksherTheme.successLight : TeksherTheme.successDark,
-                              size: 16,
-                            ),
+                        size: 16,
+                      ),
                             const SizedBox(width: 6),
-                            Text(
-                              'COMPLETED',
-                              style: TextStyle(
+                      Text(
+                        'COMPLETED',
+                        style: TextStyle(
                                 color: isLightMode ? TeksherTheme.successLight : TeksherTheme.successDark,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
                     ],
-                  ],
+                        ),
+                  ),
+                ],
+              ],
                 ),
               ),
             ),

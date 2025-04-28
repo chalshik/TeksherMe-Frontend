@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
+import '../data/category_styles.dart';
 import 'test_preview_screen.dart';
 import '../widgets/pack_card.dart';
 
@@ -29,7 +30,10 @@ class CategoryPacksScreen extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 16),
+                // Category icon
+                CategoryStyles.buildCategoryIcon(category, size: 42),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     category,

@@ -809,7 +809,11 @@ class FirebaseDataService extends ChangeNotifier {
     if (testSet == null) return;
     
     Question? targetQuestion;
-    for (final question in testSet.questions) {
+    int questionIndex = -1;
+    
+    // Find the question and its index in the questions list
+    for (int i = 0; i < testSet.questions.length; i++) {
+      final question = testSet.questions[i];
       if (question.id == questionId) {
         // If selectedOptionIndex is -1, that means the question was skipped
         if (selectedOptionIndex == -1) {
@@ -820,8 +824,18 @@ class FirebaseDataService extends ChangeNotifier {
           question.selectedOptionIndex = selectedOptionIndex;
         }
         targetQuestion = question;
+        questionIndex = i;
         break;
       }
+    }
+    
+    // Update lastQuestionIndex if this is further than the current progress
+    // This ensures progress is updated even if user doesn't navigate to next question
+    if (questionIndex >= 0 && questionIndex >= testSet.lastQuestionIndex) {
+      testSet.lastQuestionIndex = questionIndex + 1; // +1 because lastQuestionIndex is 1-based
+      
+      // Also update progress in Firebase
+      await _updateTestProgress(testSetId, testSet.lastQuestionIndex, false, null);
     }
     
     if (targetQuestion != null && _auth.currentUser != null) {
@@ -1060,6 +1074,11 @@ class FirebaseDataService extends ChangeNotifier {
     } catch (e) {
       return 'General';
     }
+  }
+  
+  /// Get all category names available in the system
+  List<String> getAllCategoryNames() {
+    return _categories.map((cat) => cat.name).toList();
   }
 
   // Add commercials functionality

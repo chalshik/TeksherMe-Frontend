@@ -426,29 +426,47 @@ class _QuestionScreenState extends State<QuestionScreen> {
     final question = pack.questions[currentIndex];
     
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: MediaQuery.of(context).padding.top),
-            
-            Row(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // App Bar
+          Container(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: 16,
+              right: 16,
+              bottom: 8,
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.surface
+                  : Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 1,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Back button
                 IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => _showQuitConfirmation(),
+                  icon: const Icon(Icons.arrow_back_ios),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
+                  onPressed: () => _showQuitConfirmation(),
                 ),
                 
+                // Quiz title
                 Expanded(
-                child: Text(
+                  child: Text(
                     pack.name,
                     style: const TextStyle(
                       fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -456,208 +474,257 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   ),
                 ),
                 
-                _isTimeLimited 
-                    ? _buildTimer()
-                    : PopupMenuButton<int>(
-                        tooltip: 'Jump to question',
-                        icon: const Icon(Icons.more_vert),
-                        itemBuilder: _buildJumpToQuestionMenu,
-            onSelected: (index) => _navigateToQuestion(index),
-          ),
-              ],
-            ),
-            
-            if (_isTimeLimited) 
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    PopupMenuButton<int>(
-                      tooltip: 'Jump to question',
-                      icon: const Icon(Icons.more_vert),
-                      itemBuilder: _buildJumpToQuestionMenu,
-                      onSelected: (index) => _navigateToQuestion(index),
-                    ),
-                  ],
-                ),
-              ),
-              
-            const SizedBox(height: 8),
-            
-            LinearProgressIndicator(
-              value: (currentIndex + 1) / pack.questions.length,
-              backgroundColor: Theme.of(context).brightness == Brightness.dark 
-                  ? Colors.grey.shade800 
-                  : Colors.blue.withOpacity(0.1),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.blue,
-              ),
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                'Question ${currentIndex + 1} of ${pack.questions.length}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Question text
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
+                // Skip button
+                TextButton(
+                  onPressed: () {
+                    if (currentIndex < pack.questions.length - 1) {
+                      _navigateToQuestion(currentIndex + 1);
+                    } else {
+                      _submitTest();
+                    }
+                  },
                   child: Text(
-              question.text,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    'Skip',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    question.isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                    color: question.isBookmarked ? Colors.amber : null,
-                  ),
-                  onPressed: _toggleBookmark,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-              ),
               ],
             ),
-            const SizedBox(height: 16),
-            
-            Expanded(
-              child: ListView.builder(
-                itemCount: question.options.length,
-                itemBuilder: (context, index) {
-                  final option = question.options[index];
-                  final bool isSelected = question.selectedOptionIndex == index;
-                  
-                  Color? cardColor;
-                  if (isSelected) {
-                    cardColor = Theme.of(context).brightness == Brightness.dark 
-                        ? Theme.of(context).colorScheme.primary.withOpacity(0.2) 
-                        : Color(0xFFE3F2FD);
-                  }
-                  
-                  return Card(
-                    color: cardColor,
-                    elevation: isSelected ? 2 : 1,
-                    shadowColor: isSelected 
-                        ? Colors.blue.withOpacity(0.3) 
-                        : Colors.black.withOpacity(0.1),
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: isSelected 
-                          ? BorderSide(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-                              width: 1.5,
-                            ) 
-                          : BorderSide.none,
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : (Theme.of(context).brightness == Brightness.dark
-                                ? Colors.grey[700]
-                                : Colors.grey[300]),
-                        foregroundColor: isSelected || Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black87,
-                        child: Text(String.fromCharCode(65 + index)),
-                      ),
-                      title: Text(option.toString()),
-                      onTap: () => _answerQuestion(index),
-                      trailing: null,
-                    ),
-                  );
-                },
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+          
+          // Progress bar and indicators
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: Column(
               children: [
-                ElevatedButton(
-                  onPressed: currentIndex > 0 
-                      ? () => _navigateToQuestion(currentIndex - 1) 
-                      : null,
-                  child: const Text(
-                    '<<',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
-                    foregroundColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
+                // Progress indicator
+                Container(
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: (currentIndex + 1) / pack.questions.length,
+                      backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                          ? Colors.grey.shade800 
+                          : Colors.grey.shade200,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.green
+                            : Colors.green,
+                      ),
+                      minHeight: 4,
                     ),
                   ),
                 ),
                 
-                if (currentIndex == pack.questions.length - 1)
-                  ElevatedButton.icon(
-                    onPressed: () => _submitTest(),
-                    icon: const Icon(Icons.done_all),
-                    label: const Text('Finish Quiz'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                // Question count and timer
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Question count
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          '${currentIndex + 1}/${pack.questions.length}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                
-                ElevatedButton(
-                  onPressed: currentIndex < pack.questions.length - 1
-                      ? () => _navigateToQuestion(currentIndex + 1)
-                      : null,
-                  child: const Text(
-                    '>>',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
-                    foregroundColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                      
+                      // Timer
+                      if (_isTimeLimited)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.timer,
+                                size: 16,
+                                color: Colors.green,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _formatTimeRemaining(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-          ],
-        ),
+          ),
+          
+          // Question content
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Question category/type
+                
+                
+                // Question text
+                Text(
+                  question.text,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 32),
+                
+                // Answer options
+                ...List.generate(
+                  question.options.length,
+                  (index) {
+                    final option = question.options[index];
+                    final bool isSelected = question.selectedOptionIndex == index;
+                    final String optionLetter = String.fromCharCode(1040 + index); // А, Б, В, Г (Cyrillic)
+                    
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: InkWell(
+                        onTap: () => _answerQuestion(index),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? (isSelected 
+                                    ? Theme.of(context).colorScheme.primaryContainer
+                                    : Colors.grey.shade800)
+                                : (isSelected 
+                                    ? Colors.green.withOpacity(0.1)
+                                    : Colors.grey.shade100),
+                            borderRadius: BorderRadius.circular(8),
+                            border: isSelected
+                                ? Border.all(color: Colors.green, width: 1)
+                                : Border.all(color: Colors.grey.shade300, width: 1),
+                          ),
+                          child: Row(
+                            children: [
+                              // Option letter in circle
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isSelected
+                                      ? Colors.green
+                                      : Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.grey.shade700
+                                          : Colors.white,
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Colors.green
+                                        : Colors.grey.shade400,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    optionLetter,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black87,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              
+                              // Option text
+                              Expanded(
+                                child: Text(
+                                  option.toString(),
+                                  style: TextStyle(
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          
+          // Bottom button
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16 + MediaQuery.of(context).padding.bottom,
+              top: 16,
+            ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.surface
+                  : Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 1,
+                  offset: const Offset(0, -1),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                if (currentIndex < pack.questions.length - 1) {
+                  _navigateToQuestion(currentIndex + 1);
+                } else {
+                  _submitTest();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                currentIndex < pack.questions.length - 1 ? 'Next' : 'Finish',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -746,99 +813,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
         (route) => false,
       );
     }
-  }
-  
-  // Add method for building the timer widget
-  Widget _buildTimer() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: _secondsRemaining < 60 
-            ? Theme.of(context).brightness == Brightness.dark 
-                ? Colors.red.withOpacity(0.3) 
-                : const Color(0xFFFFEBEE) // Light red background
-            : Theme.of(context).brightness == Brightness.dark 
-                ? Theme.of(context).colorScheme.surface
-                : const Color(0xFFE3F2FD), // Light blue background
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: _secondsRemaining < 60 
-              ? Colors.red.withOpacity(0.3) 
-              : Colors.blue.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.timer, 
-            size: 16,
-            color: _secondsRemaining < 60 ? Colors.red : null,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            _formatTimeRemaining(),
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: _secondsRemaining < 60 ? Colors.red : null,
-            ),
-          ),
-        ],
-      ),
-    );
-}
-
-  // Add method for building the jump to question menu
-  List<PopupMenuEntry<int>> _buildJumpToQuestionMenu(BuildContext context) {
-    return [
-      // Add jump to question heading
-      const PopupMenuItem(
-        enabled: false,
-        child: Text(
-          'Jump to Question',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-      ),
-      // Add a divider
-      const PopupMenuDivider(),
-      // Add items for each question
-      for (int i = 0; i < pack.questions.length; i++)
-        PopupMenuItem(
-          value: i,
-          child: Row(
-            children: [
-              // Show check mark for answered questions
-              if (pack.questions[i].isAnswered)
-                Icon(
-                  Icons.check_circle,
-                  size: 16,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.green[300]
-                      : Colors.green,
-                ),
-              // Show current question indicator
-              if (i == currentIndex && !pack.questions[i].isAnswered)
-                Icon(
-                  Icons.radio_button_checked,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              // Show empty circle for unanswered, non-current questions
-              if (i != currentIndex && !pack.questions[i].isAnswered)
-                Icon(
-                  Icons.radio_button_unchecked,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-              const SizedBox(width: 8),
-              Text('Question ${i + 1}'),
-            ],
-          ),
-        ),
-    ];
   }
 }
 

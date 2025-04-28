@@ -1,0 +1,1 @@
+ /home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/.dart_tool/flutter_build/dd1ae5acd176ec4733d256da01b73712/native_assets.json: 

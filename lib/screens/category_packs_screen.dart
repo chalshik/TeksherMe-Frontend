@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
 import '../data/category_styles.dart';
 import 'test_preview_screen.dart';
-import '../widgets/pack_card.dart';
+import '../widgets/compact_pack_card.dart';
 
 class CategoryPacksScreen extends StatelessWidget {
   final String category;
@@ -57,7 +57,7 @@ class CategoryPacksScreen extends StatelessWidget {
                       itemCount: packs.length,
                       itemBuilder: (context, index) {
                         final pack = packs[index];
-                        return PackCard(
+                        return CompactPackCard(
                           pack: pack,
                           onTap: () {
                             Navigator.of(context).push(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/firebase_data_service.dart';
 import 'test_preview_screen.dart';
-import '../widgets/pack_card.dart';
+import '../widgets/compact_pack_card.dart';
 
 class BookmarksScreen extends StatelessWidget {
   const BookmarksScreen({super.key});
@@ -66,28 +66,25 @@ class BookmarkedPacksTab extends StatelessWidget {
             itemCount: bookmarkedPacks.length,
             itemBuilder: (context, index) {
               final pack = bookmarkedPacks[index];
-              return SizedBox(
-                width: double.infinity,
-                child: PackCard(
-                  pack: pack,
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => TestPreviewScreen(
-                          packId: pack.id, 
-                        ),
+              return CompactPackCard(
+                pack: pack,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => TestPreviewScreen(
+                        packId: pack.id, 
                       ),
-                    );
-                  },
-                  onBookmarkTap: () {
-                    _showUnbookmarkConfirmation(
-                      context, 
-                      'Remove Bookmark', 
-                      'Are you sure you want to remove this pack from your bookmarks?',
-                      () => dataService.togglePackBookmark(pack.id)
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
+                onBookmarkTap: () {
+                  _showUnbookmarkConfirmation(
+                    context, 
+                    'Remove Bookmark', 
+                    'Are you sure you want to remove this pack from your bookmarks?',
+                    () => dataService.togglePackBookmark(pack.id)
+                  );
+                },
               );
             },
           );

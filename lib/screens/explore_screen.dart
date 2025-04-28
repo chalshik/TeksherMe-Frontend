@@ -4,7 +4,7 @@ import '../data/firebase_data_service.dart';
 import '../data/category_styles.dart';
 import 'category_packs_screen.dart';
 import 'test_preview_screen.dart';
-import '../widgets/pack_card.dart';
+import '../widgets/compact_pack_card.dart';
 import 'package:flutter/rendering.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -132,7 +132,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   itemCount: _searchResults.length,
                   itemBuilder: (context, index) {
                     final pack = _searchResults[index];
-                    return PackCard(
+                    return CompactPackCard(
                       pack: pack,
                       onTap: () {
                         Navigator.of(context).push(

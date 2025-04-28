@@ -427,8 +427,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
     
     return Scaffold(
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // App Bar
           Container(
             padding: EdgeInsets.only(
@@ -462,11 +462,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 
                 // Quiz title
                 Expanded(
-                  child: Text(
+                child: Text(
                     pack.name,
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -489,11 +489,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          
+              ),
+              
           // Progress bar and indicators
           Container(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -506,12 +506,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(2),
                     child: LinearProgressIndicator(
-                      value: (currentIndex + 1) / pack.questions.length,
-                      backgroundColor: Theme.of(context).brightness == Brightness.dark 
-                          ? Colors.grey.shade800 
+              value: (currentIndex + 1) / pack.questions.length,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.grey.shade800 
                           : Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).brightness == Brightness.dark
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).brightness == Brightness.dark
                             ? Colors.green
                             : Colors.green,
                       ),
@@ -521,7 +521,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ),
                 
                 // Question count and timer
-                Padding(
+            Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -535,7 +535,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                               : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Text(
+              child: Text(
                           '${currentIndex + 1}/${pack.questions.length}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -555,7 +555,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
-                            children: [
+              children: [
                               Icon(
                                 Icons.timer,
                                 size: 16,
@@ -574,13 +574,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
                         ),
                     ],
                   ),
-                ),
+              ),
               ],
             ),
           ),
-          
+            
           // Question content
-          Expanded(
+            Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -598,8 +598,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ...List.generate(
                   question.options.length,
                   (index) {
-                    final option = question.options[index];
-                    final bool isSelected = question.selectedOptionIndex == index;
+                  final option = question.options[index];
+                  final bool isSelected = question.selectedOptionIndex == index;
                     final String optionLetter = String.fromCharCode(1040 + index); // А, Б, В, Г (Cyrillic)
                     
                     return Container(
@@ -649,8 +649,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                       color: isSelected
                                           ? Colors.white
                                           : Theme.of(context).brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black87,
+                            ? Colors.white
+                            : Colors.black87,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -662,7 +662,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                               Expanded(
                                 child: Text(
                                   option.toString(),
-                                  style: TextStyle(
+                    style: TextStyle(
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                   ),
                                 ),

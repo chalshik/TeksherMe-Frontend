@@ -472,23 +472,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                
-                // Skip button
-                TextButton(
-                  onPressed: () {
-                    if (currentIndex < pack.questions.length - 1) {
-                      _navigateToQuestion(currentIndex + 1);
-                    } else {
-                      _submitTest();
-                    }
-                  },
-                  child: Text(
-                    'Skip',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
                     ),
                   ],
                 ),
@@ -514,9 +497,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 Theme.of(context).brightness == Brightness.dark
                             ? Colors.green
                             : Colors.green,
-                      ),
+              ),
                       minHeight: 4,
-                    ),
+            ),
                   ),
                 ),
                 
@@ -571,9 +554,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                               ),
                             ],
                           ),
-                        ),
-                    ],
-                  ),
+              ),
+              ],
+            ),
               ),
               ],
             ),
@@ -670,9 +653,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
+                    ),
+                  );
+                },
                 ),
               ],
             ),
@@ -699,32 +682,61 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ),
               ],
             ),
-            child: ElevatedButton(
-              onPressed: () {
-                if (currentIndex < pack.questions.length - 1) {
-                  _navigateToQuestion(currentIndex + 1);
-                } else {
-                  _submitTest();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                  onPressed: currentIndex > 0 
+                      ? () => _navigateToQuestion(currentIndex - 1) 
+                      : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade300,
+                      foregroundColor: Colors.black87,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  child: const Text(
+                      'Previous',
+                    style: TextStyle(
+                        fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  ),
                 ),
-              ),
-              child: Text(
-                currentIndex < pack.questions.length - 1 ? 'Next' : 'Finish',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (currentIndex < pack.questions.length - 1) {
+                        _navigateToQuestion(currentIndex + 1);
+                      } else {
+                        _submitTest();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      currentIndex < pack.questions.length - 1 ? 'Next' : 'Finish',
+                      style: const TextStyle(
+                        fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+          ],
       ),
     );
   }

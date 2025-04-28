@@ -20,6 +20,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -232,11 +234,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
+                      obscureText: _obscurePassword,
+                      decoration: InputDecoration(
                         labelText: 'Password',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -251,11 +264,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _confirmPasswordController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
+                      obscureText: _obscureConfirmPassword,
+                      decoration: InputDecoration(
                         labelText: 'Confirm Password',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                            });
+                          },
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {

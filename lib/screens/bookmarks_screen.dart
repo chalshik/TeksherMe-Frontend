@@ -199,16 +199,16 @@ class _BookmarkedQuestionsTabState extends State<BookmarkedQuestionsTab> {
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                               // Question information
-                              Expanded(
+                          Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      question.text,
-                                      style: const TextStyle(
+                              question.text,
+                              style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -246,19 +246,19 @@ class _BookmarkedQuestionsTabState extends State<BookmarkedQuestionsTab> {
                               Column(
                                 children: [
                                   // Bookmark icon
-                                  if (packId != null)
-                                    IconButton(
+                          if (packId != null)
+                            IconButton(
                                       icon: const Icon(Icons.bookmark, color: Colors.blue, size: 20),
-                                      onPressed: () {
-                                        _showUnbookmarkConfirmation(
-                                          context, 
-                                          'Remove Bookmark', 
-                                          'Are you sure you want to remove this question from your bookmarks?',
-                                          () => dataService.toggleQuestionBookmark(packId!, question.id)
-                                        );
-                                      },
+                              onPressed: () {
+                                _showUnbookmarkConfirmation(
+                                  context, 
+                                  'Remove Bookmark', 
+                                  'Are you sure you want to remove this question from your bookmarks?',
+                                  () => dataService.toggleQuestionBookmark(packId!, question.id)
+                                );
+                              },
                                       padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
+                              constraints: const BoxConstraints(),
                                       visualDensity: VisualDensity.compact,
                                     ),
                                   
@@ -344,8 +344,8 @@ class _BookmarkedQuestionsTabState extends State<BookmarkedQuestionsTab> {
                                   children: [
                                     const Divider(height: 1),
                                     const SizedBox(height: 8),
-                                    ...List.generate(
-                                      question.options.length,
+                      ...List.generate(
+                        question.options.length,
                                       (i) {
                                         final bool isCorrect = i == question.correctOptionIndex;
                                         final bool isSelected = originalQuestion?.isAnswered == true && 
@@ -361,38 +361,38 @@ class _BookmarkedQuestionsTabState extends State<BookmarkedQuestionsTab> {
                                         
                                         return Padding(
                                           padding: const EdgeInsets.only(bottom: 8.0),
-                                          child: Row(
-                                            children: [
-                                              Container(
+                          child: Row(
+                            children: [
+                              Container(
                                                 width: 28,
                                                 height: 28,
-                                                decoration: BoxDecoration(
+                                decoration: BoxDecoration(
                                                   color: circleColor,
-                                                  shape: BoxShape.circle,
+                                  shape: BoxShape.circle,
                                                   border: isWrongAnswer
                                                       ? Border.all(color: Colors.red, width: 2)
                                                       : null,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    String.fromCharCode(65 + i),
-                                                    style: TextStyle(
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    String.fromCharCode(65 + i),
+                                    style: TextStyle(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.bold,
                                                       color: (isCorrect || isWrongAnswer) ? Colors.white : Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
                                               
                                               // Option text with indicator icons
                                               Expanded(
                                                 child: Row(
                                                   children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        question.options[i].toString(),
+                              Expanded(
+                                child: Text(
+                                  question.options[i].toString(),
                                                         style: TextStyle(
                                                           fontSize: 14,
                                                           fontWeight: isCorrect ? FontWeight.w600 : FontWeight.normal,
@@ -427,10 +427,10 @@ class _BookmarkedQuestionsTabState extends State<BookmarkedQuestionsTab> {
                                                         ),
                                                     ],
                                                   ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                ),
+                              ),
+                            ],
+                          ),
                                         );
                                       },
                                     ),
@@ -438,8 +438,8 @@ class _BookmarkedQuestionsTabState extends State<BookmarkedQuestionsTab> {
                                 ),
                               );
                             },
-                          ),
                         ),
+                      ),
                     ],
                   ),
                 ),

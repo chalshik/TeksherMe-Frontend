@@ -1,0 +1,26 @@
+<lint-module
+    format="1"
+    dir="/home/bekbolsun/.pub-cache/hosted/pub.dev/cloud_firestore-4.17.5/android"
+    name=":cloud_firestore"
+    type="LIBRARY"
+    maven="io.flutter.plugins.firebase.cloudfirestore:cloud_firestore:1.0-SNAPSHOT"
+    agpVersion="8.7.0"
+    buildFolder="/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/cloud_firestore"
+    bootClassPath="/home/bekbolsun/Android/Sdk/platforms/android-34/android.jar:/home/bekbolsun/Android/Sdk/build-tools/34.0.0/core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-34"
+    neverShrinking="true">
+  <lintOptions
+      disable="InvalidPackage"
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true">
+    <severities>
+      <severity
+        id="InvalidPackage"
+        severity="IGNORE" />
+    </severities>
+  </lintOptions>
+  <variant name="release"/>
+</lint-module>

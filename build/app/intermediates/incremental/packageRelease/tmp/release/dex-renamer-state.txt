@@ -1,0 +1,4 @@
+#Mon Apr 28 19:19:51 KGT 2025
+base.0=/home/bekbolsun/Projects/TeksherMe/TeksherMe-Frontend/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
